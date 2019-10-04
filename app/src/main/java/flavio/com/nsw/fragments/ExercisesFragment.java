@@ -15,6 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,20 +91,16 @@ public class ExercisesFragment extends Fragment {
         // Inflate the layout for this fragment
         context = getActivity().getApplicationContext();
         final View view = inflater.inflate(R.layout.fragment_exercises, container, false);
-        db = new GestioneDB(getActivity().getApplicationContext());
         ListView list = view.findViewById(R.id.exercises_list);
         List<Exercise> exercises = new ArrayList<>();
 
-        db.open();
-        Cursor c = db.getAllExercises();
-
-        while(c.moveToNext()){
-            Exercise exercise = new Exercise();
-            if(!c.getString(c.getColumnIndex(db.EXERCISE_name)).isEmpty()) {
-                exercise.setName(c.getString(c.getColumnIndex(db.EXERCISE_name)));
-            }
-            exercises.add(exercise);
-        }
+//        while(c.moveToNext()){
+//            Exercise exercise = new Exercise();
+//            if(!c.getString(c.getColumnIndex(db.EXERCISE_name)).isEmpty()) {
+//                exercise.setName(c.getString(c.getColumnIndex(db.EXERCISE_name)));
+//            }
+//            exercises.add(exercise);
+//        }
         adapter = new ExercisesCustomAdapter(exercises, getActivity().getApplicationContext() );
         list.setAdapter(adapter);
 

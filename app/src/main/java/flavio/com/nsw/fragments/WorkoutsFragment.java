@@ -30,19 +30,19 @@ public class WorkoutsFragment extends Fragment {
 
         //ArrayAdapter<String> aa = new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, workouts);
         db = new GestioneDB(getActivity().getApplicationContext());
-//        db.open();
-//        Cursor c = db.getAllWorkouts();
-//        while (c.moveToNext()) {
-//            Workout workout = new Workout();
-//            if(!c.getString(c.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
-//                workout.setName(c.getString(c.getColumnIndex(db.WORKOUT_name)));
-//            }
-//            if(!c.getString(c.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
-//                workout.setType(c.getString(c.getColumnIndex(db.WORKOUT_type)));
-//            }
-//            workout.setSets(c.getInt(c.getColumnIndex(db.WORKOUT_sets)));
-//            workouts.add(workout);
-//        }
+        db.open();
+        Cursor c = db.getAllWorkouts();
+        while (c.moveToNext()) {
+            Workout workout = new Workout();
+            if(!c.getString(c.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
+                workout.setName(c.getString(c.getColumnIndex(db.WORKOUT_name)));
+            }
+            if(!c.getString(c.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
+                workout.setType(c.getString(c.getColumnIndex(db.WORKOUT_type)));
+            }
+            workout.setSets(c.getInt(c.getColumnIndex(db.WORKOUT_sets)));
+            workouts.add(workout);
+        }
 /*
         final TextView txt = view.findViewById(R.id.textView);
         new CountDownTimer(30000, 1000) {
