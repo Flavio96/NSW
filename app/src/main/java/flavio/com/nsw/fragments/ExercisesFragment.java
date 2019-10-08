@@ -2,11 +2,13 @@ package flavio.com.nsw.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,8 @@ import flavio.com.nsw.R;
 import flavio.com.nsw.data_models.Exercise;
 import flavio.com.nsw.others.ExercisesCustomAdapter;
 import flavio.com.nsw.others.GestioneDB;
+
+import static android.support.constraint.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -101,6 +105,18 @@ public class ExercisesFragment extends Fragment {
 //            }
 //            exercises.add(exercise);
 //        }
+        XmlResourceParser parser = getResources().getXml(R.xml.exercises);
+
+        // Process the XML data
+        try{
+            processXMLData(parser);
+        }catch(IOException e){
+            e.printStackTrace();
+        }catch (XmlPullParserException e){
+            // This exception is thrown to signal XML Pull Parser related faults.
+            e.printStackTrace();
+        }
+
         adapter = new ExercisesCustomAdapter(exercises, getActivity().getApplicationContext() );
         list.setAdapter(adapter);
 
@@ -173,6 +189,41 @@ public class ExercisesFragment extends Fragment {
         });
         return view;
     }
+    protected void processXMLData(XmlResourceParser parser)throws IOException,XmlPullParserException{
+        int eventType = -1;
+        // Loop through the XML data
+        while(eventType!=parser.END_DOCUMENT){
+            if(eventType == XmlResourceParser.START_TAG){
+                String studentValue = parser.getName();
+                if (studentValue.equals("exercise")){
+                    String firstName = parser.getAttributeValue(null,"firstname");
+                    String lastName = parser.getAttributeValue(null,"lastname");
+                    String age = parser.getAttributeValue(null,"age");
+                    String fullName = firstName + " " + lastName;
+                }
+            }
+            /*
+                The method next() advances the parser to the next event. The int value returned from
+                next determines the current parser state and is identical to the value returned
+                from following calls to getEventType ().
+
+                The following event types are seen by next()
+
+                    START_TAG
+                        An XML start tag was read.
+                    TEXT
+                        Text content was read; the text content can be retrieved using the getText()
+                        method. (when in validating mode next() will not report ignorable
+                        whitespace, use nextToken() instead)
+                    END_TAG
+                        An end tag was read
+                    END_DOCUMENT
+                        No more events are available
+            */
+            eventType = parser.next();
+        }
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
