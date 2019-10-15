@@ -1,9 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 <exercises>
-    <exercise>
-        <id>0</id>
-        <name>Pike Push Ups</name>
-        <muscles>shoulders</muscles>
-        <url>https://youtu.be/h0HjqYRlXYg?t=37</url>
-    </exercise>
+    <exercise
+        id="0"
+        name="Pike Push Ups"
+        muscles="shoulders"
+        url="h0HjqYRlXYg"
+        seconds="37"
+        />
+    <exercise
+        id="1"
+        name="Regular Push Ups"
+        muscles="chest"
+        url="IODxDxX7oi4"
+        seconds="7"
+        />
+    <exercise
+        id="2"
+        name="Diamond Push Ups"
+        muscles="chest / triceps"
+        url="Tn14HJMn12w"
+        seconds="318"
+        />
+    <exercise
+        id="3"
+        name="Handstand Push Ups"
+        muscles="shoulders"
+        url="h0HjqYRlXYg"
+        seconds="64"
+        />
+    <exercise
+        id="4"
+        name="Regular Pull Ups"
+        muscles="back"
+        url="eGo4IYlbE5g"
+        seconds="249"
+        />
+    <exercise
+        id="5"
+        name="Regular Chin Ups"
+        muscles="back / biceps"
+        url="UfhT0OSUU0w"
+        seconds="355"
+        />
+    <exercise
+        id="6"
+        name="Dip"
+        muscles="chest"
+        url="2z8JmcrW-As"
+        seconds="154"
+        />
+    <exercise
+        id="7"
+        name="Tuck Front Lever"
+        muscles="back / core"
+        url="AGhb8V8M758"
+        seconds="128"
+        />
+    <exercise
+        id="8"
+        name="Adv Tuck Front Lever"
+        muscles="back / core"
+        url="AGhb8V8M758"
+        seconds="185"
+        />
+    <exercise
+        id="9"
+        name="Straddle Front Lever"
+        muscles="back / core"
+        url="AGhb8V8M758"
+        seconds="255"
+        />
+    <exercise
+        id="10"
+        name="Front Lever"
+        muscles="back / core"
+        url="jQhXRL6KnjI"
+        seconds="103"
+        />
+    <exercise
+        id="11"
+        name="Deep squat"
+        muscles="back / core"
+        url="BqF90pMpjb4"
+        seconds="9"
+        />
+    <exercise
+        id="12"
+        name="Archer Pull Ups"
+        muscles="back / core"
+        url="FnWrvWZDJTo"
+        seconds="188"
+        />
+    <exercise
+        id="13"
+        name="Toes to Bar"
+        muscles="back / core"
+        url="eSk2oo2qfPA"
+        seconds="584"
+        />
+    <exercise
+        id="14"
+        name="Archer Push Ups"
+        muscles="back / core"
+        url="6HxtxoXRFG0"
+        seconds="307"
+        />
+    <exercise
+        id="15"
+        name="Australian Pull Ups"
+        muscles="chest"
+        url="FnWrvWZDJTo"
+        seconds="20"
+        />
+    <exercise
+        id="16"
+        name="Straigh Bar Dip"
+        muscles="chest"
+        url="2IUoEAzjZqY"
+        seconds="34"
+        />
+    <exercise
+        id="17"
+        name="Muscle Ups"
+        muscles="chest"
+        url="89v8LYbgg5M"
+        seconds="18"
+        />
+    <exercise
+        id="18"
+        name="Pseudo Push Ups"
+        muscles="shoulder / chest"
+        url="x-WosgklhR0"
+        seconds="26"
+        />
+    <exercise
+        id="19"
+        name="Tricep extensions"
+        muscles= "triceps"
+        url="x-WosgklhR0"
+        seconds="58"
+        />
 </exercises>

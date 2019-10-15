@@ -3,9 +3,11 @@ package flavio.com.nsw.fragments;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class WorkoutsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_workouts,container,false);
         ListView list = view.findViewById(R.id.workouts_list);
 
-        List<Workout> workouts = new ArrayList<>();
+        final List<Workout> workouts = new ArrayList<>();
 
         //ArrayAdapter<String> aa = new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, workouts);
         db = new GestioneDB(getActivity().getApplicationContext());
@@ -43,6 +45,26 @@ public class WorkoutsFragment extends Fragment {
             workout.setSets(c.getInt(c.getColumnIndex(db.WORKOUT_sets)));
             workouts.add(workout);
         }
+
+        adapter = new WorkoutsCustomAdapter(workouts, getActivity().getApplicationContext());
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                WorkoutDetailFragment fragment = new WorkoutDetailFragment();
+                Bundle arguments = new Bundle();
+                arguments.putInt("workout_id" , workouts.get(position).getId());
+                fragment.setArguments(arguments);
+
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                        android.R.anim.fade_out);
+                fragmentTransaction.replace(R.id.frame, fragment);
+                fragmentTransaction.commitAllowingStateLoss();
+            }
+        });
+
 /*
         final TextView txt = view.findViewById(R.id.textView);
         new CountDownTimer(30000, 1000) {
@@ -56,9 +78,6 @@ public class WorkoutsFragment extends Fragment {
             }
         }.start();
 */
-
-        adapter = new WorkoutsCustomAdapter(workouts, getActivity().getApplicationContext());
-        list.setAdapter(adapter);
         return view;
     }
 }

@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.WorkoutActivity" />
+        <activity android:name=".others.ytDialog" />
     </application>
 
 </manifest>

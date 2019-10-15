@@ -1,36 +1,30 @@
 package flavio.com.nsw.others;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.List;
 
 import flavio.com.nsw.R;
-import flavio.com.nsw.data_models.Exercise;
+import flavio.com.nsw.data_models.RepsSets;
+import flavio.com.nsw.data_models.Workout;
 
-public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements View.OnClickListener{
+public class RepsSetsCustomAdapter extends ArrayAdapter<RepsSets> implements View.OnClickListener{
 
-    private List<Exercise> dataSet;
+    private List<RepsSets> dataSet;
     Context mContext;
 
     // View lookup cache
     private static class ViewHolder {
-        RelativeLayout bg;
-        TextView txtName, txtMuscles, txtPath;
+        TextView txtName, txtSets;
     }
 
-    public ExercisesCustomAdapter(List<Exercise> data, Context context) {
-        super(context, R.layout.exercises_list_element, data);
+    public RepsSetsCustomAdapter(List<RepsSets> data, Context context) {
+        super(context, R.layout.workout_exercise_element, data);
         this.dataSet = data;
         this.mContext=context;
 
@@ -41,7 +35,7 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
 
         int position=(Integer) v.getTag();
         Object object= getItem(position);
-        Exercise dataModel=(Exercise)object;
+        RepsSets dataModel=(RepsSets)object;
 
         /*switch (v.getId())
         {
@@ -57,7 +51,7 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        final Exercise dataModel = getItem(position);
+        RepsSets dataModel = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
 
@@ -67,10 +61,9 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
 
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.exercises_list_element, parent, false);
-            viewHolder.bg = convertView.findViewById(R.id.bg);
-            viewHolder.txtName = (TextView) convertView.findViewById(R.id.e_name);
-            viewHolder.txtMuscles = (TextView) convertView.findViewById(R.id.e_muscles);
+            convertView = inflater.inflate(R.layout.workouts_list_element, parent, false);
+            viewHolder.txtName = (TextView) convertView.findViewById(R.id.exName);
+            viewHolder.txtSets = (TextView) convertView.findViewById(R.id.exReps);
 
             result=convertView;
 
@@ -81,12 +74,8 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
         }
         lastPosition = position;
 
-        if(position%2 == 0)
-            viewHolder.bg.setBackgroundColor(Color.parseColor("#fef2e8"));
-        viewHolder.txtName.setText(dataModel.getName());
-        viewHolder.txtMuscles.setText(dataModel.getMuscles());
-
-
+        viewHolder.txtName.setText(dataModel.getExercise().getName());
+        viewHolder.txtSets.setText("x"+dataModel.getReps());
         // Return the completed view to render on screen
         return convertView;
     }

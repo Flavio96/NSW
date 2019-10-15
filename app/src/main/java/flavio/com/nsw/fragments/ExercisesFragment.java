@@ -1,61 +1,36 @@
 package flavio.com.nsw.fragments;
 
-import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.XmlResourceParser;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import flavio.com.nsw.R;
 import flavio.com.nsw.data_models.Exercise;
 import flavio.com.nsw.others.ExercisesCustomAdapter;
-import flavio.com.nsw.others.GestioneDB;
+import flavio.com.nsw.others.ytDialog;
 
-import static android.support.constraint.Constraints.TAG;
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ExercisesFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ExercisesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ExercisesFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
 
     private OnFragmentInteractionListener mListener;
 
 
     Context context;
-    GestioneDB db;
     ExercisesCustomAdapter adapter;
 
     public ExercisesFragment() {
@@ -71,22 +46,14 @@ public class ExercisesFragment extends Fragment {
      * @return A new instance of fragment ExercisesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ExercisesFragment newInstance(String param1, String param2) {
+    public ExercisesFragment newInstance(String param1, String param2) {
         ExercisesFragment fragment = new ExercisesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -96,20 +63,12 @@ public class ExercisesFragment extends Fragment {
         context = getActivity().getApplicationContext();
         final View view = inflater.inflate(R.layout.fragment_exercises, container, false);
         ListView list = view.findViewById(R.id.exercises_list);
-        List<Exercise> exercises = new ArrayList<>();
+        final List<Exercise> exercises = new ArrayList<>();
 
-//        while(c.moveToNext()){
-//            Exercise exercise = new Exercise();
-//            if(!c.getString(c.getColumnIndex(db.EXERCISE_name)).isEmpty()) {
-//                exercise.setName(c.getString(c.getColumnIndex(db.EXERCISE_name)));
-//            }
-//            exercises.add(exercise);
-//        }
         XmlResourceParser parser = getResources().getXml(R.xml.exercises);
-
         // Process the XML data
         try{
-            processXMLData(parser);
+            processXMLData(parser, exercises);
         }catch(IOException e){
             e.printStackTrace();
         }catch (XmlPullParserException e){
@@ -117,90 +76,38 @@ public class ExercisesFragment extends Fragment {
             e.printStackTrace();
         }
 
-        adapter = new ExercisesCustomAdapter(exercises, getActivity().getApplicationContext() );
+        adapter = new ExercisesCustomAdapter(exercises, getActivity().getApplicationContext());
         list.setAdapter(adapter);
 
-        FloatingActionButton exFab = view.findViewById(R.id.add_exercise_fab);
-        exFab.setOnClickListener(new View.OnClickListener() {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                final Dialog dialog = new Dialog(getActivity());
-                dialog.setContentView(R.layout.dialog_add_exercise);
-                dialog.setTitle("");
-                Button cancel, save;
-                cancel = dialog.findViewById(R.id.ex_cancel);
-                save = dialog.findViewById(R.id.ex_save);
-
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-
-                save.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EditText name, muscles, path;
-                        name = dialog.findViewById(R.id.txt_ex_name);
-                        muscles = dialog.findViewById(R.id.txt_muscles);
-                        path = dialog.findViewById(R.id.txt_image_name);
-                        String name_text, muscles_text, path_text;
-                        if(isEmpty(name)){
-                            name_text="";
-                        }else{
-                            name_text=name.getText().toString();
-                        }
-                        if(isEmpty(muscles)){
-                            muscles_text="";
-                        }else{
-                            muscles_text=muscles.getText().toString();
-                        }
-                        if(isEmpty(path)){
-                            path_text="";
-                        }else{
-                            path_text=path.getText().toString();
-                        }
-                        db.open();
-                        db.insertExercise(name_text, muscles_text, path_text);
-                        db.close();
-
-                        ListView list = view.findViewById(R.id.exercises_list);
-                        List exercises = new ArrayList();
-                        db = new GestioneDB(context);
-                        db.open();
-                        Cursor c = db.getAllExercises();
-                        while (c.moveToNext()) {
-                            Exercise exercise = new Exercise();
-                            if(!c.getString(c.getColumnIndex(db.EXERCISE_name)).isEmpty()) {
-                                exercise.setName(c.getString(c.getColumnIndex(db.EXERCISE_name)));
-                            }
-                            exercises.add(exercise);
-                        }
-                        adapter = new ExercisesCustomAdapter(exercises, getActivity().getApplicationContext() );
-                        list.setAdapter(adapter);
-
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                    Intent i = new Intent(getActivity(), ytDialog.class);
+                    i.putExtra("url", exercises.get(position).getUrl());
+                    i.putExtra("sec", exercises.get(position).getSeconds());
+                    startActivity(i);
             }
         });
+
         return view;
     }
-    protected void processXMLData(XmlResourceParser parser)throws IOException,XmlPullParserException{
+
+    public static List<Exercise> processXMLData(XmlResourceParser parser, List<Exercise> exercises)throws IOException,XmlPullParserException{
         int eventType = -1;
         // Loop through the XML data
         while(eventType!=parser.END_DOCUMENT){
             if(eventType == XmlResourceParser.START_TAG){
-                String studentValue = parser.getName();
-                if (studentValue.equals("exercise")){
-                    String firstName = parser.getAttributeValue(null,"firstname");
-                    String lastName = parser.getAttributeValue(null,"lastname");
-                    String age = parser.getAttributeValue(null,"age");
-                    String fullName = firstName + " " + lastName;
+                Exercise e = new Exercise();
+                String element = parser.getName();
+                if(element.equals("exercise")){
+                    e.setId(Integer.parseInt(parser.getAttributeValue(null,"id")));
+                    e.setName(parser.getAttributeValue(null,"name"));
+                    e.setMuscles(parser.getAttributeValue(null, "muscles"));
+                    e.setUrl(parser.getAttributeValue(null, "url"));
+                    e.setSeconds(Integer.parseInt(parser.getAttributeValue(null, "seconds")));
+                    exercises.add(e);
                 }
+
             }
             /*
                 The method next() advances the parser to the next event. The int value returned from
@@ -222,10 +129,10 @@ public class ExercisesFragment extends Fragment {
             */
             eventType = parser.next();
         }
+
+        return exercises;
     }
 
-
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -249,26 +156,7 @@ public class ExercisesFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-
-    private boolean isEmpty(EditText etText) {
-        if (etText.getText().toString().trim().length() > 0)
-            return false;
-
-        return true;
     }
 }

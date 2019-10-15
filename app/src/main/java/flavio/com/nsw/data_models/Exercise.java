@@ -4,9 +4,27 @@ public class Exercise {
     private int id;
     private String name, image_name;
     private String muscles;
+    private String url;
+    private int seconds;
+
+    public int getSeconds() {
+        return seconds;
+    }
+
+    public void setSeconds(int seconds) {
+        this.seconds = seconds;
+    }
 
     public int getId() {
         return id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public void setId(int id) {

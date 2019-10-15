@@ -11,6 +11,7 @@
     <string name="nav_notifications">Notifications</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_about_us">About Us</string>
+    <string name="api_key">AIzaSyBD_h2gu2ah8LzcgNw3FveT8JMvncJrLpI</string>
 
     <!-- Toolbar titles when navigation menu item is selected -->
 

@@ -43,7 +43,7 @@ public class WorkoutActivity extends AppCompatActivity {
             w.setType(c.getString(c.getColumnIndex(db.WORKOUT_type)));
             w.setSets(c.getInt(c.getColumnIndex(db.WORKOUT_sets)));
 
-            Cursor c_ex = db.getExercisesByWorkoutId(w.getId());
+            Cursor c_ex = db.findRepsSetsByWorkoutId(w.getId());
             List<RepsSets_Exercises> exercises = new ArrayList<RepsSets_Exercises>();
             while(c_ex.moveToNext()){
                 RepsSets_Exercises rs_ex = new RepsSets_Exercises();

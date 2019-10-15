@@ -284,10 +284,12 @@ public class GestioneDB {
         return db.update(EXERCISE_TABLE, args, EXERCISE_name + "='" + name + "'", null) > 0;
     }
 
-    public Cursor getExercisesByWorkoutId(long workoutId){
-        String rawQuery = "select e.*, rs.* from "+EXERCISE_TABLE+" e inner join "+REPS_SETS_TABLE+" rs on e."+EXERCISE_ID+" = rs."+REPS_SETS_fk_exercise+" where rs."+REPS_SETS_fk_workout+"= ?";
-        return db.rawQuery(rawQuery, new String[]{String.valueOf(workoutId)});
+    public Cursor findRepsSetsByWorkoutId(long workoutId){
+        Cursor mCursore = db.query(true, REPS_SETS_TABLE, new String[]{REPS_SETS_ID, REPS_SETS_reps, REPS_SETS_rest, REPS_SETS_sets, REPS_SETS_fk_exercise, REPS_SETS_fk_workout}, REPS_SETS_fk_workout + "=" + workoutId, null, null, null, null, null);
+        if (mCursore != null) {
+            mCursore.moveToFirst();
+        }
+        return mCursore;
     }
-
 
 }
