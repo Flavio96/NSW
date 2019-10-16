@@ -1,5 +1,6 @@
 package flavio.com.nsw.fragments;
 
+import android.app.Dialog;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -9,7 +10,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -22,6 +26,7 @@ import flavio.com.nsw.data_models.Exercise;
 import flavio.com.nsw.data_models.RepsSets;
 import flavio.com.nsw.others.GestioneDB;
 import flavio.com.nsw.others.RepsSetsCustomAdapter;
+import flavio.com.nsw.others.SpinAdapter;
 
 public class WorkoutDetailFragment extends Fragment {
 
@@ -34,7 +39,7 @@ public class WorkoutDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_workout_detail,container,false);
+        final View view = inflater.inflate(R.layout.fragment_workout_detail,container,false);
 
         fab = view.findViewById(R.id.fab);
         fab1 = view.findViewById(R.id.fab1);
@@ -90,6 +95,46 @@ public class WorkoutDetailFragment extends Fragment {
         ListView exercises = view.findViewById(R.id.woExercises);
         RepsSetsCustomAdapter aa = new RepsSetsCustomAdapter(exerciseList, view.getContext());
         exercises.setAdapter(aa);
+
+        final List<Exercise> finalEList = eList;
+        fab1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog d = new Dialog(view.getContext());
+                d.setContentView(R.layout.dialog_add_exercise);
+
+                final Spinner s = d.findViewById(R.id.ex_spinner);
+                SpinAdapter aa = new SpinAdapter
+                        (view.getContext(), android.R.layout.simple_spinner_dropdown_item, finalEList);
+                aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                s.setAdapter(aa);
+
+                Button cancel, add;
+                cancel = d.findViewById(R.id.ex_cancel);
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.dismiss();
+                    }
+                });
+                add = d.findViewById(R.id.ex_add);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int id = (int) s.getSelectedItemId();
+                        EditText rest = d.findViewById(R.id.ex_rest);
+                        EditText reps = d.findViewById(R.id.ex_rest);
+                        int repsNum = Integer.parseInt(reps.getText().toString());
+                        int restNum = Integer.parseInt(rest.getText().toString());
+
+                        db.insertRepsSets(repsNum, 0, restNum, id, workoutId);
+                    }
+                });
+                d.show();
+            }
+        });
+
         return view;
     }
 

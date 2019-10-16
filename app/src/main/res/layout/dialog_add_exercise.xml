@@ -1,60 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="15dp"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/ex_dialog_title"
+    <Spinner
+        android:id="@+id/ex_spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Add Exercise"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/lbl_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Name:" />
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/txt_ex_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:text="" />
+        <TextView
+            android:id="@+id/txt_reps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="REPS: " />
 
-    <TextView
-        android:id="@+id/lbl_muscles"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Muscels:" />
+        <EditText
+            android:id="@+id/ex_reps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
 
-    <EditText
-        android:id="@+id/txt_muscles"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:text="" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/lbl_image_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="How to perform:" />
+        <TextView
+            android:id="@+id/txt_rest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="REST: " />
 
-    <EditText
-        android:id="@+id/txt_image_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:text="" />
+        <EditText
+            android:id="@+id/ex_rest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -69,10 +66,10 @@
             android:text="Cancel" />
 
         <Button
-            android:id="@+id/ex_save"
+            android:id="@+id/ex_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Save" />
+            android:text="Add" />
     </LinearLayout>
 </LinearLayout>
