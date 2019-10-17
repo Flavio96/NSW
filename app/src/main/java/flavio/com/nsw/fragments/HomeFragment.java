@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,7 @@ import flavio.com.nsw.others.ViewPagerAdapter;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ViewPager.OnPageChangeListener {
 
     FloatingActionButton fab, fab1, fab2;
 
@@ -51,6 +52,10 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    public ViewPagerAdapter myPagerAdapter;
+
+    public ViewPager viewPager;
 
     private OnFragmentInteractionListener mListener;
 
@@ -91,15 +96,14 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
          context = getActivity().getApplicationContext();
         final View view = inflater.inflate(R.layout.fragment_home, container, false);
-        ViewPager viewPager = view.findViewById(R.id.viewpager);
-        ViewPagerAdapter myPagerAdapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        viewPager = view.findViewById(R.id.viewpager);
+        myPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         myPagerAdapter.addFragment(new WorkoutsFragment(), "Workouts");
         myPagerAdapter.addFragment(new GoalsFragment(), "Goals");
         viewPager.setAdapter(myPagerAdapter);
+        viewPager.addOnPageChangeListener(this);
         TabLayout tabLayout = view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-
-        db = new GestioneDB(context);
 
         fab = view.findViewById(R.id.fab);
         fab1 = view.findViewById(R.id.fab1);
@@ -190,12 +194,30 @@ public class HomeFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        myPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
+        myPagerAdapter.addFragment(new WorkoutsFragment(), "Workouts");
+        myPagerAdapter.addFragment(new GoalsFragment(), "Goals");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onPageScrolled(int i, float v, int i1) {
+
+    }
+
+    @Override
+    public void onPageSelected(int i) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
     }
 
     /**

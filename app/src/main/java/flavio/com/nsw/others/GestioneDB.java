@@ -248,18 +248,10 @@ public class GestioneDB {
         return db.delete(WORKOUT_TABLE, WORKOUT_ID + "=" + id, null) > 0;
     }
 
-    /*
-    Cancellazione di un exercise
-    */
-    public boolean deleteExercise(String name) {
-        // applico il metodo delete
-        return db.delete(EXERCISE_TABLE, EXERCISE_name + "='" + name + "'", null) > 0;
-    }
 
-
-    public boolean deleteExercise(int id) {
+    public boolean deleteRepsSetsByWorkoutId(int id) {
         // applico il metodo delete
-        return db.delete(EXERCISE_TABLE, EXERCISE_ID + "=" + id, null) > 0;
+        return db.delete(REPS_SETS_TABLE, REPS_SETS_fk_workout + "=" + id, null) > 0;
     }
 
     /*
@@ -284,7 +276,7 @@ public class GestioneDB {
         return db.update(EXERCISE_TABLE, args, EXERCISE_name + "='" + name + "'", null) > 0;
     }
 
-    public Cursor findRepsSetsByWorkoutId(long workoutId){
+    public Cursor findRepsSetsByWorkoutId(int workoutId){
         Cursor mCursore = db.query(true, REPS_SETS_TABLE, new String[]{REPS_SETS_ID, REPS_SETS_reps, REPS_SETS_rest, REPS_SETS_sets, REPS_SETS_fk_exercise, REPS_SETS_fk_workout}, REPS_SETS_fk_workout + "=" + workoutId, null, null, null, null, null);
         if (mCursore != null) {
             mCursore.moveToFirst();

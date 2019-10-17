@@ -1,18 +1,24 @@
 package flavio.com.nsw.activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -21,6 +27,7 @@ import flavio.com.nsw.fragments.ExercisesFragment;
 import flavio.com.nsw.fragments.HomeFragment;
 import flavio.com.nsw.others.GestioneDB;
 import flavio.com.nsw.R;
+import flavio.com.nsw.others.RequestPermissionHandler;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ExercisesFragment.OnFragmentInteractionListener{
 
@@ -34,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
     private static final String TAG_EXERCISES = "exercises";
-    private static final String TAG_MOVIES = "movies";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
@@ -49,18 +55,34 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     private Handler mHandler;
 
     private Toolbar toolbar;
+    private RequestPermissionHandler mRequestPermissionHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRequestPermissionHandler = new RequestPermissionHandler();
+
+        mRequestPermissionHandler.requestPermission(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE
+        }, 123, new RequestPermissionHandler.RequestPermissionListener() {
+            @Override
+            public void onSuccess() {
+                //Toast.makeText(MainActivity.this, "request permission success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed() {
+                Toast.makeText(MainActivity.this, "request permission failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         mHandler = new Handler();
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
 
 
         // initializing navigation menu
@@ -73,6 +95,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         }
 
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mRequestPermissionHandler.onRequestPermissionsResult(requestCode, permissions,
+                grantResults);
     }
 
     private void selectNavMenu() {
@@ -160,10 +190,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     case R.id.nav_exercises:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_EXERCISES;
-                        break;
-                    case R.id.nav_movies:
-                        navItemIndex = 2;
-                        CURRENT_TAG = TAG_MOVIES;
                         break;
                     case R.id.nav_notifications:
                         navItemIndex = 3;

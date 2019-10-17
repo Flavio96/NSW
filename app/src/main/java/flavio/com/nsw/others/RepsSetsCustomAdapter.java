@@ -61,21 +61,17 @@ public class RepsSetsCustomAdapter extends ArrayAdapter<RepsSets> implements Vie
 
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.workouts_list_element, parent, false);
-            viewHolder.txtName = (TextView) convertView.findViewById(R.id.exName);
-            viewHolder.txtSets = (TextView) convertView.findViewById(R.id.exReps);
+            convertView = inflater.inflate(R.layout.workout_exercise_element, parent, false);
+            viewHolder.txtName = convertView.findViewById(R.id.exName);
+            viewHolder.txtSets = convertView.findViewById(R.id.exReps);
 
-            result=convertView;
+            viewHolder.txtName.setText(dataModel.getExercise().getName());
+            viewHolder.txtSets.setText("x"+dataModel.getReps());
 
             convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-            result=convertView;
         }
         lastPosition = position;
 
-        viewHolder.txtName.setText(dataModel.getExercise().getName());
-        viewHolder.txtSets.setText("x"+dataModel.getReps());
         // Return the completed view to render on screen
         return convertView;
     }

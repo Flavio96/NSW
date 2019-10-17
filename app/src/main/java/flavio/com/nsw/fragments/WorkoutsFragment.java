@@ -30,7 +30,6 @@ public class WorkoutsFragment extends Fragment {
 
         final List<Workout> workouts = new ArrayList<>();
 
-        //ArrayAdapter<String> aa = new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, workouts);
         db = new GestioneDB(getActivity().getApplicationContext());
         db.open();
         Cursor c = db.getAllWorkouts();
@@ -57,9 +56,7 @@ public class WorkoutsFragment extends Fragment {
                 arguments.putInt("workout_id" , workouts.get(position).getId());
                 fragment.setArguments(arguments);
 
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-                        android.R.anim.fade_out);
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment);
                 fragmentTransaction.commitAllowingStateLoss();
             }

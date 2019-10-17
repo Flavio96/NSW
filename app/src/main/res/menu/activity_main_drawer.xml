@@ -10,10 +10,6 @@
             android:id="@+id/nav_exercises"
             android:icon="@android:drawable/ic_input_add"
             android:title="@string/nav_exercises" />
-        <item
-            android:id="@+id/nav_movies"
-            android:icon="@android:drawable/ic_input_add"
-            android:title="@string/nav_movies" />
 
         <item
             android:id="@+id/nav_notifications"
