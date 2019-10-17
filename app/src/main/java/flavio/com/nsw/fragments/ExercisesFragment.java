@@ -100,12 +100,14 @@ public class ExercisesFragment extends Fragment {
                 Exercise e = new Exercise();
                 String element = parser.getName();
                 if(element.equals("exercise")){
-                    e.setId(Integer.parseInt(parser.getAttributeValue(null,"id")));
-                    e.setName(parser.getAttributeValue(null,"name"));
-                    e.setMuscles(parser.getAttributeValue(null, "muscles"));
-                    e.setUrl(parser.getAttributeValue(null, "url"));
-                    e.setSeconds(Integer.parseInt(parser.getAttributeValue(null, "seconds")));
-                    exercises.add(e);
+                    if(!parser.getAttributeValue(null,"name").isEmpty()) {
+                        e.setId(Integer.parseInt(parser.getAttributeValue(null, "id")));
+                        e.setName(parser.getAttributeValue(null, "name"));
+                        e.setMuscles(parser.getAttributeValue(null, "muscles"));
+                        e.setUrl(parser.getAttributeValue(null, "url"));
+                        e.setSeconds(Integer.parseInt(parser.getAttributeValue(null, "seconds")));
+                        exercises.add(e);
+                    }
                 }
 
             }

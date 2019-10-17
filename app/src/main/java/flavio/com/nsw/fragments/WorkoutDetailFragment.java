@@ -124,7 +124,7 @@ public class WorkoutDetailFragment extends Fragment {
                     public void onClick(View v) {
                         int id = (int) s.getSelectedItemId();
                         EditText rest = d.findViewById(R.id.ex_rest);
-                        EditText reps = d.findViewById(R.id.ex_rest);
+                        EditText reps = d.findViewById(R.id.ex_reps);
                         int repsNum = Integer.parseInt(reps.getText().toString());
                         int restNum = Integer.parseInt(rest.getText().toString());
 

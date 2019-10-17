@@ -69,8 +69,8 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.exercises_list_element, parent, false);
             viewHolder.bg = convertView.findViewById(R.id.bg);
-            viewHolder.txtName = (TextView) convertView.findViewById(R.id.e_name);
-            viewHolder.txtMuscles = (TextView) convertView.findViewById(R.id.e_muscles);
+            viewHolder.txtName = convertView.findViewById(R.id.e_name);
+            viewHolder.txtMuscles = convertView.findViewById(R.id.e_muscles);
 
             result=convertView;
 
@@ -83,6 +83,8 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
 
         if(position%2 == 0)
             viewHolder.bg.setBackgroundColor(Color.parseColor("#fef2e8"));
+        else
+            viewHolder.bg.setBackgroundColor(Color.parseColor("#ffffff"));
         viewHolder.txtName.setText(dataModel.getName());
         viewHolder.txtMuscles.setText(dataModel.getMuscles());
 
