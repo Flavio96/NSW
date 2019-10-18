@@ -236,6 +236,14 @@ public class GestioneDB {
     /*
     Cancellazione di un workout
     */
+    public boolean deleteRepsSetsById(int id) {
+        // applico il metodo delete
+        return db.delete(REPS_SETS_TABLE, REPS_SETS_ID + "='" + id + "'", null) > 0;
+    }
+
+    /*
+    Cancellazione di un workout
+    */
     public boolean deleteWorkout(String name) {
         // applico il metodo delete
         return db.delete(WORKOUT_TABLE, WORKOUT_name + "='" + name + "'", null) > 0;

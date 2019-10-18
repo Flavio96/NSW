@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,6 +37,10 @@ public class WorkoutDetailFragment extends Fragment {
     Integer workoutId;
 
     FloatingActionButton fab, fab1, fab2, fab3;
+
+    List<Exercise> eList;
+
+    ListView exercises;
 
     boolean isFABOpen = false;
 
@@ -73,10 +78,7 @@ public class WorkoutDetailFragment extends Fragment {
         db = new GestioneDB(getActivity().getApplicationContext());
         db.open();
 
-        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
-        List<RepsSets> exerciseList = new ArrayList<RepsSets>();
-        List<Exercise> eList = new ArrayList<>();
-
+        eList = new ArrayList<>();
         XmlResourceParser parser = getResources().getXml(R.xml.exercises);
         try {
             eList = ExercisesFragment.processXMLData(parser, eList);
@@ -85,6 +87,11 @@ public class WorkoutDetailFragment extends Fragment {
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         }
+
+        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
+        List<RepsSets> exerciseList = new ArrayList<RepsSets>();
+        exercises = view.findViewById(R.id.woExercises);
+
         while (c.moveToNext()){
             RepsSets rp = new RepsSets();
             rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)),eList));
@@ -95,11 +102,38 @@ public class WorkoutDetailFragment extends Fragment {
             exerciseList.add(rp);
         }
 
-        ListView exercises = view.findViewById(R.id.woExercises);
         RepsSetsCustomAdapter aa = new RepsSetsCustomAdapter(exerciseList, view.getContext());
         exercises.setAdapter(aa);
+        final List<RepsSets> finalExList = exerciseList;
+        exercises.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+                AlertDialog myQuittingDialogBox = new AlertDialog.Builder(getActivity())
+                        // set message, title, and icon
+                        .setTitle("Remove")
+                        .setMessage("Do you want to remove the Exercise?")
+                        .setIcon(android.R.drawable.ic_menu_delete)
 
-        final List<Exercise> finalEList = eList;
+                        .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                db.deleteRepsSetsById(finalExList.get(position).getId());
+                                refreshList(view);
+                                dialog.dismiss();
+                            }
+
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                dialog.dismiss();
+
+                            }
+                        })
+                        .show();
+            }
+        });
+
         fab1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,7 +142,7 @@ public class WorkoutDetailFragment extends Fragment {
 
                 final Spinner s = d.findViewById(R.id.ex_spinner);
                 SpinAdapter aa = new SpinAdapter
-                        (view.getContext(), android.R.layout.simple_spinner_dropdown_item, finalEList);
+                        (view.getContext(), android.R.layout.simple_spinner_dropdown_item, eList);
                 aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
                 s.setAdapter(aa);
@@ -132,6 +166,9 @@ public class WorkoutDetailFragment extends Fragment {
                         int restNum = Integer.parseInt(rest.getText().toString());
 
                         db.insertRepsSets(repsNum, 0, restNum, id, workoutId);
+
+                        refreshList(view);
+
                         d.dismiss();
                     }
                 });
@@ -145,7 +182,7 @@ public class WorkoutDetailFragment extends Fragment {
                 AlertDialog myQuittingDialogBox = new AlertDialog.Builder(getActivity())
                         // set message, title, and icon
                         .setTitle("Delete")
-                        .setMessage("Do you want to Delete?")
+                        .setMessage("Do you want to Delete the Workout?")
                         .setIcon(android.R.drawable.ic_menu_delete)
 
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -183,6 +220,23 @@ public class WorkoutDetailFragment extends Fragment {
             }
         }
         return null;
+    }
+
+    private void refreshList(View view){
+        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
+        List<RepsSets> exerciseList = new ArrayList<RepsSets>();
+
+        while (c.moveToNext()){
+            RepsSets rp = new RepsSets();
+            rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)), eList));
+            rp.setId(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
+            rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
+            rp.setRest(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_rest)));
+            rp.setSets(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_sets)));
+            exerciseList.add(rp);
+        }
+        RepsSetsCustomAdapter aa = new RepsSetsCustomAdapter(exerciseList, view.getContext());
+        exercises.setAdapter(aa);
     }
 
 
