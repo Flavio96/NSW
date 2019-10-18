@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import flavio.com.nsw.R;
+import flavio.com.nsw.data_models.Workout;
 import flavio.com.nsw.others.GestioneDB;
 import flavio.com.nsw.others.ViewPagerAdapter;
+import flavio.com.nsw.others.WorkoutsCustomAdapter;
 
 
 /**
@@ -153,21 +155,30 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
                         }else{
                             type_text=type.getText().toString();
                         }
-                        db.open();
-                        db.insertWorkout(name_text, type_text, 1);
-                        db.close();
-
-                        ListView list = view.findViewById(R.id.workouts_list);
-                        List workouts = new ArrayList();
-                        ArrayAdapter<String> aa = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, workouts);
                         db = new GestioneDB(context);
                         db.open();
+                        db.insertWorkout(name_text, type_text, 1);
+
+                        ListView list = view.findViewById(R.id.workouts_list);
+                        List<Workout> workouts = new ArrayList();
                         Cursor c = db.getAllWorkouts();
                         while (c.moveToNext()) {
-                            workouts.add(c.getString(c.getColumnIndex("name")));
+                            Workout workout = new Workout();
+                            if(c.getInt(c.getColumnIndex(db.WORKOUT_ID))>=0) {
+                                workout.setId(c.getInt(c.getColumnIndex(db.WORKOUT_ID)));
+                            }
+                            if(!c.getString(c.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
+                                workout.setName(c.getString(c.getColumnIndex(db.WORKOUT_name)));
+                            }
+                            if(!c.getString(c.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
+                                workout.setType(c.getString(c.getColumnIndex(db.WORKOUT_type)));
+                            }
+                            workout.setSets(c.getInt(c.getColumnIndex(db.WORKOUT_sets)));
+                            workouts.add(workout);
                         }
+                        WorkoutsCustomAdapter aa = new WorkoutsCustomAdapter(workouts, getActivity().getApplicationContext());
                         list.setAdapter(aa);
-
+                        db.close();
                         dialog.dismiss();
                     }
                 });

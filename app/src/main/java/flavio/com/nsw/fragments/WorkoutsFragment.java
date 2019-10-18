@@ -35,6 +35,9 @@ public class WorkoutsFragment extends Fragment {
         Cursor c = db.getAllWorkouts();
         while (c.moveToNext()) {
             Workout workout = new Workout();
+            if(c.getInt(c.getColumnIndex(db.WORKOUT_ID))>=0) {
+                workout.setId(c.getInt(c.getColumnIndex(db.WORKOUT_ID)));
+            }
             if(!c.getString(c.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
                 workout.setName(c.getString(c.getColumnIndex(db.WORKOUT_name)));
             }
@@ -58,6 +61,7 @@ public class WorkoutsFragment extends Fragment {
 
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment);
+                fragmentTransaction.addToBackStack("STACK");
                 fragmentTransaction.commitAllowingStateLoss();
             }
         });

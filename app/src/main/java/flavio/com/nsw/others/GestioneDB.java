@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 
 public class GestioneDB {
 
@@ -35,15 +36,15 @@ public class GestioneDB {
     public static final String EXERCISE_TABLE = "exercise";
     public static final String REPS_SETS_TABLE = "reps_sets";
     public static final String GOAL_TABLE = "goal";
-    static final int DATABASE_VERSIONE = 1;
+    static final int DATABASE_VERSIONE = 3;
 
     /*
     Creo una costante contenente la query per la creazione del database
     */
-    static final String CREATE_TABLE_WORKOUT = "create table workout (workout_id integer primary key autoincrement, name text not null, type text, sets integer);";
-    static final String CREATE_TABLE_EXERCISE = "create table exercise (exercise_id integer primary key autoincrement, name text not null, muscles text, img text);";
-    static final String CREATE_TABLE_REPS_SETS = "create table reps_sets (reps_sets_id integer primary key autoincrement, reps integer, sets integer, rest integer, fk_workout integer, fk_exercise integer);";
-    static final String CREATE_TABLE_GOAL = "create table goal (goal_id integer primary key autoincrement, reps integer, fk_exercise integer);";
+    static final String CREATE_TABLE_WORKOUT = "create table workout (workout_id INTEGER primary key, name text, type text, sets INTEGER);";
+    static final String CREATE_TABLE_EXERCISE = "create table exercise (exercise_id integer primary key, name text not null, muscles text, img text);";
+    static final String CREATE_TABLE_REPS_SETS = "create table reps_sets (reps_sets_id INTEGER primary key, reps INTEGER, sets INTEGER, rest INTEGER, fk_workout INTEGER, fk_exercise INTEGER);";
+    static final String CREATE_TABLE_GOAL = "create table goal (goal_id INTEGER primary key, reps INTEGER, fk_exercise INTEGER);";
 
     final Context context;
     DatabaseHelper DBHelper;
@@ -73,7 +74,7 @@ public class GestioneDB {
         public void onCreate(SQLiteDatabase db) {
             try {
                 db.execSQL(CREATE_TABLE_WORKOUT);
-                db.execSQL(CREATE_TABLE_EXERCISE);
+                //db.execSQL(CREATE_TABLE_EXERCISE);
                 db.execSQL(CREATE_TABLE_REPS_SETS);
                 db.execSQL(CREATE_TABLE_GOAL);
             } catch (SQLException e) {
@@ -83,9 +84,7 @@ public class GestioneDB {
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-            // TODO Auto-generated method stub
-
+        public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
         }
     }
 
