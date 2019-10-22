@@ -154,7 +154,7 @@ public class GestioneDB {
 
     public Cursor findWorkoutById(int id) throws SQLException {
         // applico il metodo query filtrando per ID
-        Cursor mCursore = db.query(true, WORKOUT_TABLE, new String[]{WORKOUT_ID, WORKOUT_name, WORKOUT_sets}, WORKOUT_ID + "=" + id, null, null, null, null, null);
+        Cursor mCursore = db.query(true, WORKOUT_TABLE, new String[]{WORKOUT_ID, WORKOUT_name, WORKOUT_type, WORKOUT_sets}, WORKOUT_ID + "=" + id, null, null, null, null, null);
         if (mCursore != null) {
             mCursore.moveToFirst();
         }
@@ -264,12 +264,12 @@ public class GestioneDB {
     /*
     Aggiorno dati di un workout
     */
-    public boolean updateWorkout(String name) {
+    public boolean updateWorkoutSets(long id, int sets) {
         // creo una mappa di valori
         ContentValues args = new ContentValues();
-        args.put(WORKOUT_name, name);
+        args.put(WORKOUT_sets, sets);
         // applico il metodo update
-        return db.update(WORKOUT_TABLE, args, WORKOUT_name + "='" + name + "'", null) > 0;
+        return db.update(WORKOUT_TABLE, args, WORKOUT_ID + "='" + id + "'", null) > 0;
     }
 
     /*

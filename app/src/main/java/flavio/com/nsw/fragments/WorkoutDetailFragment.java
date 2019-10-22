@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -27,6 +29,7 @@ import java.util.List;
 import flavio.com.nsw.R;
 import flavio.com.nsw.data_models.Exercise;
 import flavio.com.nsw.data_models.RepsSets;
+import flavio.com.nsw.data_models.Workout;
 import flavio.com.nsw.others.GestioneDB;
 import flavio.com.nsw.others.RepsSetsCustomAdapter;
 import flavio.com.nsw.others.SpinAdapter;
@@ -35,12 +38,15 @@ public class WorkoutDetailFragment extends Fragment {
 
     GestioneDB db;
     Integer workoutId;
+    Workout workout;
 
     FloatingActionButton fab, fab1, fab2, fab3;
 
     List<Exercise> eList;
 
     ListView exercises;
+
+    TextView sets, name;
 
     boolean isFABOpen = false;
 
@@ -77,6 +83,21 @@ public class WorkoutDetailFragment extends Fragment {
 
         db = new GestioneDB(getActivity().getApplicationContext());
         db.open();
+        workout = new Workout();
+        Cursor c1 = db.findWorkoutById(workoutId);
+
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_ID)).isEmpty()) {
+            workout.setId(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_ID)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_sets)).isEmpty()) {
+            workout.setSets(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_sets)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
+            workout.setType(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_type)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
+            workout.setName(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_name)));
+        }
 
         eList = new ArrayList<>();
         XmlResourceParser parser = getResources().getXml(R.xml.exercises);
@@ -131,6 +152,42 @@ public class WorkoutDetailFragment extends Fragment {
                             }
                         })
                         .show();
+            }
+        });
+
+        sets = view.findViewById(R.id.woSets);
+        name = view.findViewById(R.id.woTitle);
+        name.setText(workout.getName());
+        sets.setText("SETS: "+workout.getSets());
+        sets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Sets");
+
+                // Set up the input
+                final EditText input = new EditText(view.getContext());
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(!input.getText().toString().isEmpty()){
+                            db.updateWorkoutSets(workoutId, Integer.parseInt(input.getText().toString()));
+                            sets.setText("SETS: "+input.getText().toString());
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
 
