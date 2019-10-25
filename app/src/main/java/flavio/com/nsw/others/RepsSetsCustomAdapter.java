@@ -3,7 +3,6 @@ package flavio.com.nsw.others;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,7 @@ import java.util.List;
 
 import flavio.com.nsw.R;
 import flavio.com.nsw.data_models.RepsSets;
-import flavio.com.nsw.data_models.Workout;
-import flavio.com.nsw.fragments.HomeFragment;
-
-public class RepsSetsCustomAdapter extends ArrayAdapter<RepsSets> implements View.OnClickListener{
+public class RepsSetsCustomAdapter extends ArrayAdapter implements View.OnClickListener{
 
     private List<RepsSets> dataSet;
     Context mContext;
@@ -29,7 +25,7 @@ public class RepsSetsCustomAdapter extends ArrayAdapter<RepsSets> implements Vie
         TextView txtName, txtSets;
     }
 
-    public RepsSetsCustomAdapter(List<RepsSets> data, Context context) {
+    public RepsSetsCustomAdapter(Context context, List<RepsSets> data) {
         super(context, R.layout.workout_exercise_element, data);
         this.dataSet = data;
         this.mContext=context;
@@ -72,7 +68,7 @@ public class RepsSetsCustomAdapter extends ArrayAdapter<RepsSets> implements Vie
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        RepsSets dataModel = getItem(position);
+        RepsSets dataModel = dataSet.get(position);
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
 
@@ -81,7 +77,7 @@ public class RepsSetsCustomAdapter extends ArrayAdapter<RepsSets> implements Vie
         if (convertView == null) {
 
             viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.workout_exercise_element, parent, false);
             viewHolder.txtName = convertView.findViewById(R.id.exName);
             viewHolder.txtSets = convertView.findViewById(R.id.exReps);

@@ -6,8 +6,8 @@
         android:id="@+id/exName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/fab_margin"
         android:text="TextView" />
 
     <TextView
@@ -15,6 +15,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@id/exName"
+        android:layout_marginLeft="@dimen/fab_margin"
         android:text="TextView" />
+
+
+    <ImageView
+        android:id="@+id/handler"
+        android:layout_width="60px"
+        android:layout_height="60px"
+        android:src="@android:drawable/btn_star_big_on"
+        android:layout_toRightOf="@id/exReps"
+        />
 </RelativeLayout>
