@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 public class GestioneDB {
 
@@ -85,6 +86,19 @@ public class GestioneDB {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
+
+            try {
+                //db.execSQL("ALTER TABLE "+REPS_SETS_TABLE+" ADD COLUMN "++" TEXT");
+
+
+
+            } catch (Exception e) {
+                Log.i("SQLiteDatabase: ", "onUpgrade Exception : "+e);
+            }
+
+
+            onCreate(db);
+
         }
     }
 
@@ -238,7 +252,7 @@ public class GestioneDB {
     */
     public boolean deleteRepsSetsById(int id) {
         // applico il metodo delete
-        return db.delete(REPS_SETS_TABLE, REPS_SETS_ID + "='" + id + "'", null) > 0;
+        return db.delete(REPS_SETS_TABLE, REPS_SETS_ID + "=" + id, null) > 0;
     }
 
     /*
@@ -283,8 +297,24 @@ public class GestioneDB {
         return db.update(EXERCISE_TABLE, args, EXERCISE_name + "='" + name + "'", null) > 0;
     }
 
+    /*
+    Aggiorno dati di un workout
+    */
+    public void updateRepsSetsOrder(long id1, long id2, int pos1, int pos2) {
+        // creo una mappa di valori
+        ContentValues args = new ContentValues();
+        args.put(REPS_SETS_sets, pos2);
+        // applico il metodo update
+        db.update(REPS_SETS_TABLE, args, REPS_SETS_ID + "='" + id1 + "'", null);
+
+        ContentValues args2 = new ContentValues();
+        args2.put(REPS_SETS_sets, pos1);
+        db.update(REPS_SETS_TABLE, args2, REPS_SETS_ID + "='" + id2 + "'", null);
+
+    }
+
     public Cursor findRepsSetsByWorkoutId(int workoutId){
-        Cursor mCursore = db.query(true, REPS_SETS_TABLE, new String[]{REPS_SETS_ID, REPS_SETS_reps, REPS_SETS_rest, REPS_SETS_sets, REPS_SETS_fk_exercise, REPS_SETS_fk_workout}, REPS_SETS_fk_workout + "=" + workoutId, null, null, null, null, null);
+        Cursor mCursore = db.query(true, REPS_SETS_TABLE, new String[]{REPS_SETS_ID, REPS_SETS_reps, REPS_SETS_rest, REPS_SETS_sets, REPS_SETS_fk_exercise, REPS_SETS_fk_workout}, REPS_SETS_fk_workout + "=" + workoutId, null, null, null, REPS_SETS_sets + " ASC", null);
         if (mCursore != null) {
             mCursore.moveToFirst();
         }

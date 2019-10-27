@@ -127,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             drawer.closeDrawers();
 
             // show or hide the fab button
-            Toast.makeText(this, CURRENT_TAG, Toast.LENGTH_LONG).show();
-            return;
+            //Toast.makeText(this, CURRENT_TAG, Toast.LENGTH_LONG).show();
         }
 
         // Sometimes, when fragment has huge data, screen seems hanging
@@ -141,10 +140,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                 // update the main content by replacing fragments
                 Fragment fragment = getHomeFragment();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-                        android.R.anim.fade_out);
                 fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
-                fragmentTransaction.commitAllowingStateLoss();
+                fragmentTransaction.commit();
             }
         };
 

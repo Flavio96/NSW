@@ -1,5 +1,6 @@
 package flavio.com.nsw.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -18,6 +19,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -27,6 +30,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,6 +72,8 @@ public class WorkoutDetailFragment extends Fragment {
 
     TextView sets, name;
 
+    SeekBar scrollControl;
+
     boolean isFABOpen = false;
 
     boolean mDragMode;
@@ -77,11 +83,17 @@ public class WorkoutDetailFragment extends Fragment {
     int mDragPointOffset;
 
     ImageView mDragView;
+    List<RepsSets> exerciseList;
 
+    Context ctx;
+
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_workout_detail,container,false);
 
+        ctx = view.getContext();
 
         mDragView = view.findViewById(R.id.handler);
         fab = view.findViewById(R.id.fab);
@@ -140,7 +152,7 @@ public class WorkoutDetailFragment extends Fragment {
         }
 
         Cursor c = db.findRepsSetsByWorkoutId(workoutId);
-        List<RepsSets> exerciseList = new ArrayList<RepsSets>();
+        exerciseList = new ArrayList<RepsSets>();
         exercises = view.findViewById(R.id.woExercises);
 
         while (c.moveToNext()){
@@ -157,38 +169,23 @@ public class WorkoutDetailFragment extends Fragment {
                 exerciseList);
         //exercises.setAdapter(aa);
 
-        ArrayList<String> content = new ArrayList<String>(mListContent.length);
-        for (int i=0; i < mListContent.length; i++) {
-            content.add(mListContent[i]);
-        }
+        ArrayList<String> content = new ArrayList<String>(exerciseList.size());
+        for(RepsSets rs : exerciseList){
+            content.add(rs.getExercise().getName()+"&&"
+            +"x" + rs.getReps() + "&&"
+            +rs.getId());
 
-        //exercises.setAdapter(new DragNDropAdapter(view.getContext(), new int[]{R.layout.workout_exercise_element}, new int[]{R.id.exName}, content));//new DragNDropAdapter(this,content)
-        exercises.setAdapter(new RepsSetsCustomAdapter(view.getContext(), exerciseList));
+        }
+//        for (int i=0; i < mListContent.length; i++) {
+//            content.add(mListContent[i]);
+//        }
+
+        exercises.setAdapter(new DragNDropAdapter(view.getContext(), new int[]{R.layout.workout_exercise_element}, new int[]{R.id.exName, R.id.exReps, R.id.exId}, content));//new DragNDropAdapter(this,content)
+        //exercises.setAdapter(new RepsSetsCustomAdapter(view.getContext(), exerciseList));
         exercises.setOnTouchListener(new View.OnTouchListener() {
-            private int CLICK_ACTION_THRESHOLD = 20;
-            private float startX;
-            private float startY;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        startX = event.getX();
-                        startY = event.getY();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        float endX = event.getX();
-                        float endY = event.getY();
-                        if (isAClick(startX, endX, startY, endY)) {
-                            Toast.makeText(view.getContext(), "hjh", Toast.LENGTH_SHORT).show();// WE HAVE A CLICK!!
-                        }
-                        break;
-                }
                 return onTouchEvent(event);
-            }
-            private boolean isAClick(float startX, float endX, float startY, float endY) {
-                float differenceX = Math.abs(startX - endX);
-                float differenceY = Math.abs(startY - endY);
-                return !(differenceX > CLICK_ACTION_THRESHOLD/* =5 */ || differenceY > CLICK_ACTION_THRESHOLD);
             }
         });
 
@@ -288,8 +285,11 @@ public class WorkoutDetailFragment extends Fragment {
                         EditText reps = d.findViewById(R.id.ex_reps);
                         int repsNum = Integer.parseInt(reps.getText().toString());
                         int restNum = Integer.parseInt(rest.getText().toString());
+                        int pos = 0;
+                        if(exerciseList.size()>0)
+                            pos = exerciseList.size()-1;
 
-                        db.insertRepsSets(repsNum, 0, restNum, id, workoutId);
+                        db.insertRepsSets(repsNum, pos, restNum, id, workoutId);
 
                         refreshList(view);
 
@@ -334,7 +334,56 @@ public class WorkoutDetailFragment extends Fragment {
             }
         });
 
+        scrollControl = view.findViewById(R.id.scrollControl);
+        setScrollControl();
+
         return view;
+    }
+
+
+    public void setScrollControl (){
+
+
+        if(exercises.getCount()>0){
+            int last = exercises.getLastVisiblePosition();
+            if(last == exercises.getCount() - 1) {
+                // It fits!
+                scrollControl.setVisibility(GONE);
+            }
+            else {
+                // It doesn't fit...
+                scrollControl.setVisibility(View.VISIBLE);
+                final int pages = exercises.getCount() - 1 / last;
+                scrollControl.setMax(pages);
+                scrollControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        if(b){
+                            if(i<pages && i>0)
+                                exercises.smoothScrollToPosition((int)exerciseList.size()-1/i);
+                            else
+                                if(i == 0)
+                                    exercises.smoothScrollToPosition(0);
+                                else
+                                    exercises.smoothScrollToPosition(exerciseList.size()-1);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+            }
+        }else{
+            scrollControl.setVisibility(GONE);
+        }
     }
 
     public boolean onTouchEvent(MotionEvent ev) {
@@ -345,7 +394,7 @@ public class WorkoutDetailFragment extends Fragment {
         if (action == MotionEvent.ACTION_DOWN && x < exercises.getWidth()/4) {
             mDragMode = true;
         }
-
+        mDragMode = false;
         if (!mDragMode)
 
         switch (action) {
@@ -368,8 +417,17 @@ public class WorkoutDetailFragment extends Fragment {
                 mDragMode = false;
                 mEndPosition = exercises.pointToPosition(x,y);
                 stopDrag(mStartPosition - exercises.getFirstVisiblePosition());
-                if (mDropListener != null && mStartPosition != INVALID_POSITION && mEndPosition != INVALID_POSITION)
+                if (mDropListener != null && mStartPosition != INVALID_POSITION && mEndPosition != INVALID_POSITION) {
                     mDropListener.onDrop(mStartPosition, mEndPosition);
+                    db.open();
+                    RepsSets a = exerciseList.get(mStartPosition);
+                    RepsSets b = exerciseList.get(mEndPosition);
+                    db.updateRepsSetsOrder(a.getId(), b.getId(), mStartPosition, mEndPosition);
+                    a.setSets(mEndPosition);
+                    b.setSets(mStartPosition);
+                    exerciseList.set(mStartPosition, b);
+                    exerciseList.set(mEndPosition, a);
+                }
                 break;
         }
         return true;
@@ -523,15 +581,13 @@ public class WorkoutDetailFragment extends Fragment {
                     itemView.setVisibility(View.INVISIBLE);
                     defaultBackgroundColor = itemView.getDrawingCacheBackgroundColor();
                     itemView.setBackgroundColor(backgroundColor);
-                    ImageView iv = (ImageView)itemView.findViewById(R.id.handler);
-                    if (iv != null) iv.setVisibility(View.INVISIBLE);
                 }
 
                 public void onStopDrag(View itemView) {
-                    itemView.setVisibility(View.VISIBLE);
-                    itemView.setBackgroundColor(defaultBackgroundColor);
-                    ImageView iv = (ImageView)itemView.findViewById(R.id.handler);
-                    if (iv != null) iv.setVisibility(View.VISIBLE);
+                    if(itemView != null) {
+                        itemView.setVisibility(View.VISIBLE);
+                        itemView.setBackgroundColor(defaultBackgroundColor);
+                    }
                 }
 
             };

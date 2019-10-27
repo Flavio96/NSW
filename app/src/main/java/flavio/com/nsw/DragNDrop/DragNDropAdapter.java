@@ -17,19 +17,30 @@
 package flavio.com.nsw.DragNDrop;
 
 import java.util.ArrayList;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import flavio.com.nsw.R;
+import flavio.com.nsw.others.GestioneDB;
 
 public final class DragNDropAdapter extends BaseAdapter implements RemoveListener, DropListener{
 
 	private int[] mIds;
     private int[] mLayouts;
+    private String[] s;
     private LayoutInflater mInflater;
     private ArrayList<String> mContent;
+    private GestioneDB db;
 
     public DragNDropAdapter(Context context, ArrayList<String> content) {
         init(context,new int[]{android.R.layout.simple_list_item_1},new int[]{android.R.id.text1}, content);
@@ -41,6 +52,7 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
 
     private void init(Context context, int[] layouts, int[] ids, ArrayList<String> content) {
     	// Cache the LayoutInflate to avoid asking for a new one each time.
+        db = new GestioneDB(context);
     	mInflater = LayoutInflater.from(context);
     	mIds = ids;
     	mLayouts = layouts;
@@ -81,7 +93,7 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
      * @see android.widget.ListAdapter#getView(int, View,
      *      ViewGroup)
      */
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         // A ViewHolder keeps references to children views to avoid unneccessary calls
         // to findViewById() on each row.
         ViewHolder holder;
@@ -95,7 +107,12 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
             // Creates a ViewHolder and store references to the two children views
             // we want to bind data to.
             holder = new ViewHolder();
+
             holder.text = (TextView) convertView.findViewById(mIds[0]);
+            holder.reps = (TextView) convertView.findViewById(mIds[1]);
+            holder.id = (TextView) convertView.findViewById(mIds[2]);
+
+            holder.delete = convertView.findViewById(R.id.btnRemove);
 
             convertView.setTag(holder);
         } else {
@@ -105,13 +122,49 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
         }
 
         // Bind the data efficiently with the holder.
-        holder.text.setText(mContent.get(position));
+        String content = mContent.get(position);
+        s = content.split("&&");
+        holder.text.setText(s[0]);
+        holder.reps.setText(s[1]);
+        holder.id.setText(s[2]);
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog myQuittingDialogBox = new AlertDialog.Builder(v.getContext())
+                        // set message, title, and icon
+                        .setTitle("Remove")
+                        .setMessage("Do you want to remove the Exercise?")
+                        .setIcon(android.R.drawable.ic_menu_delete)
+
+                        .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                db.open();
+                                db.deleteRepsSetsById(Integer.parseInt(s[2]));
+                                mContent.remove(position);
+                                dialog.dismiss();
+                                notifyDataSetChanged();
+                            }
+
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                dialog.dismiss();
+
+                            }
+                        })
+                        .show();
+            }
+        });
 
         return convertView;
     }
 
     static class ViewHolder {
-        TextView text;
+        TextView text, reps, id;
+        ImageButton delete;
     }
 
 	public void onRemove(int which) {

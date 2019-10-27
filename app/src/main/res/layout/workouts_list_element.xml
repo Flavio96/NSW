@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorDark"
     android:descendantFocusability="blocksDescendants">
 
     <TextView
@@ -10,31 +11,33 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="Marshmallow"
-        android:textColor="@android:color/black"
+        android:clickable="false"
         android:focusable="false"
-        android:clickable="false"/>
+        android:text="Marshmallow"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
 
     <TextView
         android:id="@+id/w_sets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:text="x3"
-        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:clickable="false"
         android:focusable="false"
-        android:clickable="false" />
+        android:text="x3"
+        android:textColor="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/w_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/w_name"
-        android:text="Android 6.0"
-        android:textColor="@android:color/black"
+        android:clickable="false"
         android:focusable="false"
-        android:clickable="false" />
+        android:text="Android 6.0"
+        android:textColor="@color/colorPrimary" />
 
 </RelativeLayout>

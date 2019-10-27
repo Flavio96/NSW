@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/colorDark">
 
     <TextView
         android:id="@+id/woTitle"
@@ -10,10 +11,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:background="@color/colorDark"
         android:gravity="center_horizontal"
         android:text="n/a"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:textColor="@color/colorPrimary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/woSets"
@@ -21,16 +24,33 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/woTitle"
         android:layout_alignParentRight="true"
-        android:text="SETS: n/a" />
+        android:background="@color/colorDark"
+        android:text="SETS: n/a"
+        android:textColor="@color/colorPrimary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <ListView
         android:id="@+id/woExercises"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/woSets"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorDark"
+        android:fadeScrollbars="false">
 
     </ListView>
+
+    <SeekBar
+        android:id="@+id/scrollControl"
+        style="@style/Widget.AppCompat.SeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:max="10"
+        android:progress="3" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab3"
@@ -44,6 +64,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
+        android:fadeScrollbars="false"
         android:tint="@android:color/white"
         app:backgroundTint="@color/design_default_color_primary_dark"
         app:srcCompat="@android:drawable/ic_menu_delete" />

@@ -4,16 +4,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@android:drawable/ic_input_add"
+            android:icon="@drawable/round_home_white"
             android:title="@string/nav_home" />
         <item
             android:id="@+id/nav_exercises"
-            android:icon="@android:drawable/ic_input_add"
+            android:icon="@drawable/ic_accessibility"
             android:title="@string/nav_exercises" />
 
         <item
             android:id="@+id/nav_notifications"
-            android:icon="@android:drawable/ic_input_add"
+            android:icon="@android:drawable/ic_popup_reminder"
             android:title="@string/nav_notifications" />
 
         <item
@@ -22,7 +22,7 @@
             android:title="@string/nav_settings" />
     </group>
 
-    <item android:title="Other">
+    <!--<item android:title="Other">
         <menu>
             <item
                 android:id="@+id/nav_about_us"
@@ -31,6 +31,6 @@
                 android:id="@+id/nav_privacy_policy"
                 android:title="@string/privacy_policy" />
         </menu>
-    </item>
+    </item>-->
 
 </menu>
