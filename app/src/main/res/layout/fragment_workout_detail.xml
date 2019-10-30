@@ -66,7 +66,7 @@
         android:layout_marginBottom="@dimen/fab_margin"
         android:fadeScrollbars="false"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/design_default_color_primary_dark"
+        app:backgroundTint="@color/colorSecondDark"
         app:srcCompat="@android:drawable/ic_menu_delete" />
 
     <android.support.design.widget.FloatingActionButton
@@ -82,7 +82,7 @@
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/design_default_color_primary_dark"
+        app:backgroundTint="@color/colorSecondDark"
         app:srcCompat="@android:drawable/ic_media_play" />
 
     <android.support.design.widget.FloatingActionButton
@@ -98,7 +98,7 @@
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/design_default_color_primary_dark"
+        app:backgroundTint="@color/colorSecondDark"
         app:rippleColor="@color/colorAccent"
         app:srcCompat="@drawable/add_exercise" />
 
@@ -108,8 +108,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/design_default_color_primary_dark"
+        app:backgroundTint="@color/colorSecondDark"
         app:srcCompat="@android:drawable/ic_input_add" />
 </RelativeLayout>

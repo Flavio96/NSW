@@ -82,9 +82,9 @@ public class ExercisesCustomAdapter extends ArrayAdapter<Exercise> implements Vi
         lastPosition = position;
 
         if(position%2 == 0)
-            viewHolder.bg.setBackgroundColor(Color.parseColor("#fef2e8"));
+            viewHolder.bg.setBackgroundColor(convertView.getResources().getColor(R.color.colorDark));
         else
-            viewHolder.bg.setBackgroundColor(Color.parseColor("#ffffff"));
+            viewHolder.bg.setBackgroundColor(convertView.getResources().getColor(R.color.colorDark1));
         viewHolder.txtName.setText(dataModel.getName());
         viewHolder.txtMuscles.setText(dataModel.getMuscles());
 
