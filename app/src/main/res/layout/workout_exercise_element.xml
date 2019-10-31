@@ -14,7 +14,7 @@
         android:layout_marginRight="4dp"
         android:text="TextView"
         android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold" />
 
     <TextView
@@ -22,10 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_toRightOf="@id/exName"
+        android:layout_toLeftOf="@id/btnRemove"
         android:text="TextView"
         android:textColor="@color/colorPrimary"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/exId"

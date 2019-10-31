@@ -84,7 +84,7 @@ public class WorkoutsCustomAdapter extends ArrayAdapter<Workout> implements View
 
         viewHolder.txtName.setText(dataModel.getName());
         viewHolder.txtType.setText(dataModel.getType());
-        viewHolder.txtSets.setText(""+dataModel.getId());
+        viewHolder.txtSets.setText("SETS: "+dataModel.getSets());
         // Return the completed view to render on screen
         return convertView;
     }

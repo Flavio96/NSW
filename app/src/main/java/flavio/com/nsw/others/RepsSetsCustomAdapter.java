@@ -83,7 +83,11 @@ public class RepsSetsCustomAdapter extends ArrayAdapter implements View.OnClickL
             viewHolder.txtSets = convertView.findViewById(R.id.exReps);
 
             viewHolder.txtName.setText(dataModel.getExercise().getName());
-            viewHolder.txtSets.setText("x"+dataModel.getReps());
+
+            if(dataModel.getReps()>0)
+                viewHolder.txtSets.setText("x"+dataModel.getReps());
+            else
+                viewHolder.txtSets.setText("MAX");
 
             convertView.setTag(viewHolder);
         }

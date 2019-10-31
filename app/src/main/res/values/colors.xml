@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#C00000</color>
     <color name="colorSecondDark">#800000</color>
     <color name="colorDark">#000000</color>
+    <color name="colorDialogDark">#121212</color>
     <color name="colorDark1">#1F1F1F</color>
     <color name="colorAccent">#C00000</color>
 </resources>

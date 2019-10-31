@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -86,6 +87,7 @@ public class WorkoutDetailFragment extends Fragment {
     List<RepsSets> exerciseList;
 
     Context ctx;
+    AutoCompleteTextView autotxt;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -172,7 +174,7 @@ public class WorkoutDetailFragment extends Fragment {
         ArrayList<String> content = new ArrayList<String>(exerciseList.size());
         for(RepsSets rs : exerciseList){
             content.add(rs.getExercise().getName()+"&&"
-            +"x" + rs.getReps() + "&&"
+            +rs.getReps() + "&&"
             +rs.getId());
 
         }
@@ -261,12 +263,15 @@ public class WorkoutDetailFragment extends Fragment {
                 final Dialog d = new Dialog(view.getContext());
                 d.setContentView(R.layout.dialog_add_exercise);
 
-                final Spinner s = d.findViewById(R.id.ex_spinner);
+                //final Spinner s = d.findViewById(R.id.ex_spinner);
+                autotxt = d.findViewById(R.id.autoCompleteTextView);
                 SpinAdapter aa = new SpinAdapter
                         (view.getContext(), android.R.layout.simple_spinner_dropdown_item, eList);
                 aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-                s.setAdapter(aa);
+                autotxt.setAdapter(aa);
+
+                autotxt.setThreshold(2);
 
                 Button cancel, add;
                 cancel = d.findViewById(R.id.ex_cancel);
@@ -280,20 +285,22 @@ public class WorkoutDetailFragment extends Fragment {
                 add.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int id = (int) s.getSelectedItemId();
-                        EditText rest = d.findViewById(R.id.ex_rest);
-                        EditText reps = d.findViewById(R.id.ex_reps);
-                        int repsNum = Integer.parseInt(reps.getText().toString());
-                        int restNum = Integer.parseInt(rest.getText().toString());
-                        int pos = 0;
-                        if(exerciseList.size()>0)
-                            pos = exerciseList.size()-1;
-
-                        db.insertRepsSets(repsNum, pos, restNum, id, workoutId);
-
-                        refreshList(view);
-
-                        d.dismiss();
+                        String input = autotxt.getText().toString();
+                        Exercise ex = findExerciseByName(input, eList);
+                        if(ex!=null) {
+                            EditText rest = d.findViewById(R.id.ex_rest);
+                            EditText reps = d.findViewById(R.id.ex_reps);
+                            int repsNum = Integer.parseInt(reps.getText().toString());
+                            int restNum = Integer.parseInt(rest.getText().toString());
+                            int pos = 0;
+                            if (exerciseList.size() > 0)
+                                pos = exerciseList.size() - 1;
+                            db.insertRepsSets(repsNum, pos, restNum, ex.getId(), workoutId);
+                            refreshList(view);
+                            d.dismiss();
+                        }else{
+                            autotxt.setError("Invalid input");
+                        }
                     }
                 });
                 d.show();
@@ -502,6 +509,15 @@ public class WorkoutDetailFragment extends Fragment {
     Exercise findExerciseById(int id, List<Exercise> list) {
         for(Exercise e : list) {
             if(e.getId() == id) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    Exercise findExerciseByName(String name, List<Exercise> list) {
+        for(Exercise e : list) {
+            if(e.getName().equals(name)) {
                 return e;
             }
         }
