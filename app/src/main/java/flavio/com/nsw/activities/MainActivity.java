@@ -23,13 +23,14 @@ import android.view.View;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import flavio.com.nsw.fragments.ExecutionFragment;
 import flavio.com.nsw.fragments.ExercisesFragment;
 import flavio.com.nsw.fragments.HomeFragment;
 import flavio.com.nsw.others.GestioneDB;
 import flavio.com.nsw.R;
 import flavio.com.nsw.others.RequestPermissionHandler;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ExercisesFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ExercisesFragment.OnFragmentInteractionListener, ExecutionFragment.OnFragmentInteractionListener {
 
     final Context context = this;
 

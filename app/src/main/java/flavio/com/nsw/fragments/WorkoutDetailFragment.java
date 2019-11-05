@@ -307,6 +307,22 @@ public class WorkoutDetailFragment extends Fragment {
             }
         });
 
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ExecutionFragment fragment = new ExecutionFragment();
+                Bundle arguments = new Bundle();
+                arguments.putInt("workout_id" , workoutId);
+                arguments.putInt("ex_num", 0);
+                fragment.setArguments(arguments);
+
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment);
+                fragmentTransaction.addToBackStack("STACK");
+                fragmentTransaction.commitAllowingStateLoss();
+            }
+        });
+
         fab3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

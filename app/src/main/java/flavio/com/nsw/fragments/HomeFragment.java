@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -158,28 +159,17 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
                         db = new GestioneDB(context);
                         db.open();
                         db.insertWorkout(name_text, type_text, 1);
-
-                        ListView list = view.findViewById(R.id.workouts_list);
-                        List<Workout> workouts = new ArrayList();
-                        Cursor c = db.getAllWorkouts();
-                        while (c.moveToNext()) {
-                            Workout workout = new Workout();
-                            if(c.getInt(c.getColumnIndex(db.WORKOUT_ID))>=0) {
-                                workout.setId(c.getInt(c.getColumnIndex(db.WORKOUT_ID)));
-                            }
-                            if(!c.getString(c.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
-                                workout.setName(c.getString(c.getColumnIndex(db.WORKOUT_name)));
-                            }
-                            if(!c.getString(c.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
-                                workout.setType(c.getString(c.getColumnIndex(db.WORKOUT_type)));
-                            }
-                            workout.setSets(c.getInt(c.getColumnIndex(db.WORKOUT_sets)));
-                            workouts.add(workout);
-                        }
-                        WorkoutsCustomAdapter aa = new WorkoutsCustomAdapter(workouts, getActivity().getApplicationContext());
-                        list.setAdapter(aa);
                         db.close();
                         dialog.dismiss();
+                        HomeFragment fragment = new HomeFragment();
+                        Bundle arguments = new Bundle();
+                        //arguments.putInt("workout_id" , workouts.get(position).getId());
+                        fragment.setArguments(arguments);
+
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frame, fragment);
+                        fragmentTransaction.commitAllowingStateLoss();
+
                     }
                 });
 
