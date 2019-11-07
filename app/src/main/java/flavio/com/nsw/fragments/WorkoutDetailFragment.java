@@ -89,6 +89,8 @@ public class WorkoutDetailFragment extends Fragment {
     Context ctx;
     AutoCompleteTextView autotxt;
 
+    XmlResourceParser parser;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -144,7 +146,7 @@ public class WorkoutDetailFragment extends Fragment {
         }
 
         eList = new ArrayList<>();
-        XmlResourceParser parser = getResources().getXml(R.xml.exercises);
+        parser = getResources().getXml(R.xml.exercises);
         try {
             eList = ExercisesFragment.processXMLData(parser, eList);
         } catch (IOException e) {
@@ -159,6 +161,15 @@ public class WorkoutDetailFragment extends Fragment {
 
         while (c.moveToNext()){
             RepsSets rp = new RepsSets();
+            eList = new ArrayList<>();
+            parser = getResources().getXml(R.xml.exercises);
+            try {
+                eList = ExercisesFragment.processXMLData(parser, eList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
             rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)),eList));
             rp.setId(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
             rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
@@ -175,7 +186,8 @@ public class WorkoutDetailFragment extends Fragment {
         for(RepsSets rs : exerciseList){
             content.add(rs.getExercise().getName()+"&&"
             +rs.getReps() + "&&"
-            +rs.getId());
+            +rs.getId() + "&&"
+            +rs.getExercise().getType());
 
         }
 //        for (int i=0; i < mListContent.length; i++) {
@@ -296,8 +308,8 @@ public class WorkoutDetailFragment extends Fragment {
                             if (exerciseList.size() > 0)
                                 pos = exerciseList.size() - 1;
                             db.insertRepsSets(repsNum, pos, restNum, ex.getId(), workoutId);
-                            refreshList(view);
                             d.dismiss();
+                            refreshList(view);
                         }else{
                             autotxt.setError("Invalid input");
                         }
@@ -541,11 +553,20 @@ public class WorkoutDetailFragment extends Fragment {
     }
 
     private void refreshList(View view){
-        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
+        /*Cursor c = db.findRepsSetsByWorkoutId(workoutId);
         List<RepsSets> exerciseList = new ArrayList<RepsSets>();
 
         while (c.moveToNext()){
             RepsSets rp = new RepsSets();
+            eList = new ArrayList<>();
+            parser = getResources().getXml(R.xml.exercises);
+            try {
+                eList = ExercisesFragment.processXMLData(parser, eList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
             rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)), eList));
             rp.setId(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
             rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
@@ -555,7 +576,17 @@ public class WorkoutDetailFragment extends Fragment {
         }
 
         RepsSetsCustomAdapter aa = new RepsSetsCustomAdapter(view.getContext(), exerciseList);
-        exercises.setAdapter(aa);
+        exercises.setAdapter(aa);*/
+
+        WorkoutDetailFragment fragment = new WorkoutDetailFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt("workout_id" , workoutId);
+        fragment.setArguments(arguments);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                android.R.anim.fade_out);
+        fragmentTransaction.replace(R.id.frame, fragment);
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
 

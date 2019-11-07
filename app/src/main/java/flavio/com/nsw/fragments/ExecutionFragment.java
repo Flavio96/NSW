@@ -1,6 +1,8 @@
 package flavio.com.nsw.fragments;
 
 import android.content.Context;
+import android.content.res.XmlResourceParser;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -11,8 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import flavio.com.nsw.R;
+import flavio.com.nsw.data_models.Exercise;
+import flavio.com.nsw.data_models.RepsSets;
+import flavio.com.nsw.data_models.Workout;
+import flavio.com.nsw.others.GestioneDB;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +49,24 @@ public class ExecutionFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private int workoutId;
     private int exNumber;
-    private int chronoTime;
+    private int paramTime;
+
+    Long startTime;
+
+    Chronometer chrono, totTime;
+    Button btnPause, btnDone;
+    TextView txtReps;
+
+    Workout workout;
+
+    RepsSets exercise;
+
+    GestioneDB db;
+
+    List<Exercise> eList;
+    List<RepsSets> exerciseList;
+
+    XmlResourceParser parser;
 
     public ExecutionFragment() {
         // Required empty public constructor
@@ -78,28 +109,82 @@ public class ExecutionFragment extends Fragment {
         if(args != null){
             workoutId = args.getInt("workout_id");
             exNumber = args.getInt("ex_num");
-            chronoTime = args.getInt("time");
+            paramTime = args.getInt("time");
         }else{
             WorkoutsFragment fragment = new WorkoutsFragment();
             FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-            fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-                    android.R.anim.fade_out);
             fragmentTransaction.replace(R.id.frame, fragment);
             fragmentTransaction.commitAllowingStateLoss();
         }
 
-        final Chronometer chrono = view.findViewById(R.id.chronometer);
-        Button btnDone = view.findViewById(R.id.btnDone);
-        final Button btnPause = view.findViewById(R.id.btnPause);
+        db = new GestioneDB(getActivity().getApplicationContext());
+        db.open();
+        workout = new Workout();
+        Cursor c1 = db.findWorkoutById(workoutId);
 
-        chrono.start();
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_ID)).isEmpty()) {
+            workout.setId(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_ID)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_sets)).isEmpty()) {
+            workout.setSets(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_sets)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
+            workout.setType(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_type)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
+            workout.setName(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_name)));
+        }
+
+        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
+        exerciseList = new ArrayList<RepsSets>();
+
+        while (c.moveToNext()){
+            RepsSets rp = new RepsSets();
+            eList = new ArrayList<>();
+            parser = getResources().getXml(R.xml.exercises);
+            try {
+                eList = ExercisesFragment.processXMLData(parser, eList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)),eList));
+            rp.setId(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
+            rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
+            rp.setRest(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_rest)));
+            rp.setSets(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_sets)));
+            exerciseList.add(rp);
+        }
+
+        exercise = exerciseList.get(exNumber);
+
+        chrono = view.findViewById(R.id.chronometer);
+        txtReps = view.findViewById(R.id.txtReps);
+        totTime = view.findViewById(R.id.totTime);
+        btnDone = view.findViewById(R.id.btnDone);
+        btnPause = view.findViewById(R.id.btnPause);
+
+        if(exercise.getExercise().getType().equals("r")){
+            txtReps.setVisibility(View.VISIBLE);
+            chrono.setVisibility(View.INVISIBLE);
+        }else{
+            txtReps.setVisibility(View.GONE);
+            chrono.setVisibility(View.VISIBLE);
+        }
+
+        totTime.setBase(SystemClock.elapsedRealtime()-paramTime);
+
+        totTime.start();
 
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WorkoutDetailFragment fragment = new WorkoutDetailFragment();
+                getTotTimeinMills();
+                ExecutionFragment fragment = new ExecutionFragment();
                 Bundle arguments = new Bundle();
                 arguments.putInt("workout_id" , workoutId);
+                arguments.putInt("time" , paramTime);
                 fragment.setArguments(arguments);
 
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -124,6 +209,21 @@ public class ExecutionFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void getTotTimeinMills(){
+        String[] currTime = totTime.getText().toString().split(":");
+        switch (currTime.length){
+            case 1:
+                paramTime = Integer.parseInt(currTime[0])+1000;
+                break;
+            case 2:
+                paramTime = Integer.parseInt(currTime[0])*60*1000 + Integer.parseInt(currTime[1])*1000;
+                break;
+            case 3:
+                paramTime = Integer.parseInt(currTime[0])*60*60*1000 + Integer.parseInt(currTime[1])*60*1000 + Integer.parseInt(currTime[2])+1000;
+                break;
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -164,4 +264,14 @@ public class ExecutionFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    Exercise findExerciseById(int id, List<Exercise> list) {
+        for(Exercise e : list) {
+            if(e.getId() == id) {
+                return e;
+            }
+        }
+        return null;
+    }
+
 }

@@ -106,6 +106,7 @@ public class ExercisesFragment extends Fragment {
                         e.setMuscles(parser.getAttributeValue(null, "muscles"));
                         e.setUrl(parser.getAttributeValue(null, "url"));
                         e.setSeconds(Integer.parseInt(parser.getAttributeValue(null, "seconds")));
+                        e.setType(parser.getAttributeValue(null, "type"));
                         exercises.add(e);
                     }
                 }

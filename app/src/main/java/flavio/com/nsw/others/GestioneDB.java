@@ -46,6 +46,7 @@ public class GestioneDB {
     static final String CREATE_TABLE_EXERCISE = "create table exercise (exercise_id integer primary key, name text not null, muscles text, img text);";
     static final String CREATE_TABLE_REPS_SETS = "create table reps_sets (reps_sets_id INTEGER primary key, reps INTEGER, sets INTEGER, rest INTEGER, fk_workout INTEGER, fk_exercise INTEGER);";
     static final String CREATE_TABLE_GOAL = "create table goal (goal_id INTEGER primary key, reps INTEGER, fk_exercise INTEGER);";
+    static final String CREATE_TABLE_PROGRESS = "create table progress (progress_id INTEGER primary key, progress_date TEXT, fk_exercise INTEGER, reps INTEGER);";
 
     final Context context;
     DatabaseHelper DBHelper;

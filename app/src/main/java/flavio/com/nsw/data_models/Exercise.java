@@ -6,6 +6,15 @@ public class Exercise {
     private String muscles;
     private String url;
     private int seconds;
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public int getSeconds() {
         return seconds;

@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="REPS: " />
+            android:text="REPS / SECS: " />
 
         <EditText
             android:id="@+id/ex_reps"

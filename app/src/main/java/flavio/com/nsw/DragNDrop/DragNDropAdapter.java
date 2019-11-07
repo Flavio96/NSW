@@ -126,7 +126,10 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
         s = content.split("&&");
         holder.text.setText(s[0]);
         if(Integer.parseInt(s[1])>0)
-            holder.reps.setText("x"+s[1]);
+            if(s[3].equals("r"))
+                holder.reps.setText("x"+s[1]);
+            else
+                holder.reps.setText(s[1]+"s");
         else
             holder.reps.setText("MAX");
         holder.id.setText(s[2]);
