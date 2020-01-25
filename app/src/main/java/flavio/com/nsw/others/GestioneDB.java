@@ -259,6 +259,14 @@ public class GestioneDB {
     /*
     Cancellazione di un workout
     */
+    public boolean deleteRepsSetsByWorkoutAndPosition(int wId, int pos) {
+        // applico il metodo delete
+        return db.delete(REPS_SETS_TABLE, REPS_SETS_fk_workout + "=" + wId + " and " + REPS_SETS_sets + "=" + pos, null) > 0;
+    }
+
+    /*
+    Cancellazione di un workout
+    */
     public boolean deleteWorkout(String name) {
         // applico il metodo delete
         return db.delete(WORKOUT_TABLE, WORKOUT_name + "='" + name + "'", null) > 0;
@@ -301,21 +309,24 @@ public class GestioneDB {
     /*
     Aggiorno dati di un workout
     */
-    public void updateRepsSetsOrder(long id1, long id2, int pos1, int pos2) {
+    public void updateRepsSetsOrder(long id1, int pos1) {
         // creo una mappa di valori
         ContentValues args = new ContentValues();
-        args.put(REPS_SETS_sets, pos2);
-        // applico il metodo update
+        args.put(REPS_SETS_sets, pos1);
         db.update(REPS_SETS_TABLE, args, REPS_SETS_ID + "='" + id1 + "'", null);
-
-        ContentValues args2 = new ContentValues();
-        args2.put(REPS_SETS_sets, pos1);
-        db.update(REPS_SETS_TABLE, args2, REPS_SETS_ID + "='" + id2 + "'", null);
 
     }
 
     public Cursor findRepsSetsByWorkoutId(int workoutId){
         Cursor mCursore = db.query(true, REPS_SETS_TABLE, new String[]{REPS_SETS_ID, REPS_SETS_reps, REPS_SETS_rest, REPS_SETS_sets, REPS_SETS_fk_exercise, REPS_SETS_fk_workout}, REPS_SETS_fk_workout + "=" + workoutId, null, null, null, REPS_SETS_sets + " ASC", null);
+        if (mCursore != null) {
+            mCursore.moveToFirst();
+        }
+        return mCursore;
+    }
+
+    public Cursor findRepsSetsByWorkoutIdAndPos(int workoutId, int pos){
+        Cursor mCursore = db.query(true, REPS_SETS_TABLE, new String[]{REPS_SETS_ID, REPS_SETS_reps, REPS_SETS_rest, REPS_SETS_sets, REPS_SETS_fk_exercise, REPS_SETS_fk_workout}, REPS_SETS_fk_workout + "=" + workoutId + " and " + REPS_SETS_sets + "="+pos, null, null, null, REPS_SETS_sets + " ASC", null);
         if (mCursore != null) {
             mCursore.moveToFirst();
         }

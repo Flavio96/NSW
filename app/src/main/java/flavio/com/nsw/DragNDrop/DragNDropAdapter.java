@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,7 +133,7 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
                 holder.reps.setText(s[1]+"s");
         else
             holder.reps.setText("MAX");
-        holder.id.setText(s[2]);
+        holder.id.setText(s[2] + " - " + s[4] + " - "+ s[5]);
 
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,8 +148,12 @@ public final class DragNDropAdapter extends BaseAdapter implements RemoveListene
 
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 db.open();
-                                db.deleteRepsSetsById(Integer.parseInt(s[2]));
-                                mContent.remove(position);
+                                Cursor c = db.findRepsSetsByWorkoutIdAndPos(Integer.parseInt(s[4]), Integer.parseInt(s[5]));
+                                c.moveToFirst();
+                                if(c.getCount()>0 && !c.isNull(c.getColumnIndex(GestioneDB.REPS_SETS_ID))) {
+                                    boolean x = db.deleteRepsSetsById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
+                                    mContent.remove(position);
+                                }
                                 dialog.dismiss();
                                 notifyDataSetChanged();
                             }

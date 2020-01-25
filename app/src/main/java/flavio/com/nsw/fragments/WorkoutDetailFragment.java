@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -158,8 +159,7 @@ public class WorkoutDetailFragment extends Fragment {
         Cursor c = db.findRepsSetsByWorkoutId(workoutId);
         exerciseList = new ArrayList<RepsSets>();
         exercises = view.findViewById(R.id.woExercises);
-
-        while (c.moveToNext()){
+        for( c.moveToFirst(); !c.isAfterLast(); c.moveToNext() ) {
             RepsSets rp = new RepsSets();
             eList = new ArrayList<>();
             parser = getResources().getXml(R.xml.exercises);
@@ -175,6 +175,7 @@ public class WorkoutDetailFragment extends Fragment {
             rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
             rp.setRest(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_rest)));
             rp.setSets(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_sets)));
+            rp.setWorkout(workout);
             exerciseList.add(rp);
         }
 
@@ -187,7 +188,9 @@ public class WorkoutDetailFragment extends Fragment {
             content.add(rs.getExercise().getName()+"&&"
             +rs.getReps() + "&&"
             +rs.getId() + "&&"
-            +rs.getExercise().getType());
+            +rs.getExercise().getType()+ "&&"
+            +rs.getWorkout().getId() + "&&"
+            +rs.getSets());
 
         }
 //        for (int i=0; i < mListContent.length; i++) {
@@ -322,16 +325,43 @@ public class WorkoutDetailFragment extends Fragment {
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExecutionFragment fragment = new ExecutionFragment();
-                Bundle arguments = new Bundle();
-                arguments.putInt("workout_id" , workoutId);
-                arguments.putInt("ex_num", 0);
-                fragment.setArguments(arguments);
+                final AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext()).setTitle("GET READY!").setMessage("Starting in 3 seconds");
 
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment);
-                fragmentTransaction.addToBackStack("STACK");
-                fragmentTransaction.commitAllowingStateLoss();
+                final AlertDialog alert = dialog.create();
+                alert.show();
+
+                // Hide after some seconds
+                final Handler handler  = new Handler();
+                final Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (alert.isShowing()) {
+                            alert.dismiss();
+
+                            ExecutionFragment fragment = new ExecutionFragment();
+                            Bundle arguments = new Bundle();
+                            arguments.putInt("workout_id" , workoutId);
+                            arguments.putInt("ex_num", 0);
+                            arguments.putInt("set_num", 1);
+                            arguments.putInt("time", 0);
+                            fragment.setArguments(arguments);
+
+                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(R.id.frame, fragment);
+                            fragmentTransaction.addToBackStack("STACK");
+                            fragmentTransaction.commitAllowingStateLoss();
+                        }
+                    }
+                };
+
+                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        handler.removeCallbacks(runnable);
+                    }
+                });
+
+                handler.postDelayed(runnable, 3000);
             }
         });
 
@@ -456,13 +486,16 @@ public class WorkoutDetailFragment extends Fragment {
                     mDropListener.onDrop(mStartPosition, mEndPosition);
                     db.open();
                     RepsSets a = exerciseList.get(mStartPosition);
-                    RepsSets b = exerciseList.get(mEndPosition);
-                    db.updateRepsSetsOrder(a.getId(), b.getId(), mStartPosition, mEndPosition);
-                    a.setSets(mEndPosition);
-                    b.setSets(mStartPosition);
-                    exerciseList.set(mStartPosition, b);
-                    exerciseList.set(mEndPosition, a);
+                    exerciseList.remove(mStartPosition);
+                    exerciseList.add(mEndPosition, a);
+                    int index = 0;
+                    for(RepsSets e : exerciseList){
+                        e.setSets(index);
+                        db.updateRepsSetsOrder(e.getId(), e.getSets());
+                        index++;
+                    }
                 }
+                refreshList(getView());
                 break;
         }
         return true;

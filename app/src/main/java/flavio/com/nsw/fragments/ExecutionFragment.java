@@ -1,18 +1,23 @@
 package flavio.com.nsw.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,34 +33,25 @@ import flavio.com.nsw.data_models.RepsSets;
 import flavio.com.nsw.data_models.Workout;
 import flavio.com.nsw.others.GestioneDB;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ExecutionFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ExecutionFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ExecutionFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
     private int workoutId;
     private int exNumber;
+    private int setNumber;
     private int paramTime;
+
+    String m_Text = "";
 
     Long startTime;
 
     Chronometer chrono, totTime;
-    Button btnPause, btnDone;
-    TextView txtReps;
+    Button btnPause, btnDone, btnQuit;
+    TextView txtReps, txtExName;
 
     Workout workout;
 
@@ -72,31 +68,9 @@ public class ExecutionFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ExecutionFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ExecutionFragment newInstance(String param1, String param2) {
-        ExecutionFragment fragment = new ExecutionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -109,6 +83,7 @@ public class ExecutionFragment extends Fragment {
         if(args != null){
             workoutId = args.getInt("workout_id");
             exNumber = args.getInt("ex_num");
+            setNumber = args.getInt("set_num");
             paramTime = args.getInt("time");
         }else{
             WorkoutsFragment fragment = new WorkoutsFragment();
@@ -119,59 +94,8 @@ public class ExecutionFragment extends Fragment {
 
         db = new GestioneDB(getActivity().getApplicationContext());
         db.open();
-        workout = new Workout();
-        Cursor c1 = db.findWorkoutById(workoutId);
 
-        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_ID)).isEmpty()) {
-            workout.setId(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_ID)));
-        }
-        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_sets)).isEmpty()) {
-            workout.setSets(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_sets)));
-        }
-        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
-            workout.setType(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_type)));
-        }
-        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
-            workout.setName(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_name)));
-        }
-
-        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
-        exerciseList = new ArrayList<RepsSets>();
-
-        while (c.moveToNext()){
-            RepsSets rp = new RepsSets();
-            eList = new ArrayList<>();
-            parser = getResources().getXml(R.xml.exercises);
-            try {
-                eList = ExercisesFragment.processXMLData(parser, eList);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            }
-            rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)),eList));
-            rp.setId(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
-            rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
-            rp.setRest(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_rest)));
-            rp.setSets(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_sets)));
-            exerciseList.add(rp);
-        }
-
-        exercise = exerciseList.get(exNumber);
-
-        chrono = view.findViewById(R.id.chronometer);
-        txtReps = view.findViewById(R.id.txtReps);
-        totTime = view.findViewById(R.id.totTime);
-        btnDone = view.findViewById(R.id.btnDone);
-        btnPause = view.findViewById(R.id.btnPause);
-
-        if(exercise.getExercise().getType().equals("r")){
-            txtReps.setVisibility(View.VISIBLE);
-            chrono.setVisibility(View.INVISIBLE);
-        }else{
-            txtReps.setVisibility(View.GONE);
-            chrono.setVisibility(View.VISIBLE);
-        }
+        setupView(view);
 
         totTime.setBase(SystemClock.elapsedRealtime()-paramTime);
 
@@ -181,15 +105,139 @@ public class ExecutionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getTotTimeinMills();
-                ExecutionFragment fragment = new ExecutionFragment();
-                Bundle arguments = new Bundle();
-                arguments.putInt("workout_id" , workoutId);
-                arguments.putInt("time" , paramTime);
-                fragment.setArguments(arguments);
+                if(exerciseList.size()-1!=exNumber) {
 
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment);
-                fragmentTransaction.commitAllowingStateLoss();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("Reps / secs executed");
+
+                    // Set up the input
+                    final EditText input = new EditText(view.getContext());
+                    // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                    input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    builder.setView(input);
+
+                    // Set up the buttons
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            m_Text = input.getText().toString();
+
+                            final AlertDialog.Builder dialogGetReady = new AlertDialog.Builder(view.getContext()).setTitle("REST").setMessage("" + exercise.getRest() + " seconds");
+
+                            dialogGetReady.setPositiveButton("skip", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+
+                                        ExecutionFragment fragment = new ExecutionFragment();
+                                        Bundle arguments = new Bundle();
+                                        arguments.putInt("workout_id", workoutId);
+                                        arguments.putInt("ex_num", ++exNumber);
+                                        arguments.putInt("set_num", setNumber);
+                                        String t = totTime.getText().toString();
+                                        String[] a = t.split(":");
+                                        int min = Integer.parseInt(a[0]);
+                                        int sec = Integer.parseInt(a[1]);
+                                        arguments.putInt("time", ((min * 60) + (sec))*1000);
+                                        fragment.setArguments(arguments);
+                                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                        fragmentTransaction.replace(R.id.frame, fragment);
+                                        fragmentTransaction.commitAllowingStateLoss();
+                                    }
+                            });
+
+                            final AlertDialog alert = dialogGetReady.create();
+                            alert.show();
+
+                            // Hide after some seconds
+                            final Handler handler  = new Handler();
+                            final Runnable runnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (alert.isShowing()) {
+                                        alert.dismiss();
+
+                                        ExecutionFragment fragment = new ExecutionFragment();
+                                        Bundle arguments = new Bundle();
+                                        arguments.putInt("workout_id", workoutId);
+                                        arguments.putInt("ex_num", ++exNumber);
+                                        arguments.putInt("set_num", setNumber);
+                                        arguments.putInt("time", paramTime+(exercise.getRest()*1000));
+                                        fragment.setArguments(arguments);
+
+
+
+                                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                        fragmentTransaction.replace(R.id.frame, fragment);
+                                        fragmentTransaction.commitAllowingStateLoss();
+                                    }
+                                }
+                            };
+
+                            alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    handler.removeCallbacks(runnable);
+
+                                }
+                            });
+
+                            handler.postDelayed(runnable, (exercise.getRest()*1000));
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+
+                }else{
+                    if(setNumber<workout.getSets()){
+                        setNumber = setNumber+1;
+                        final AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext()).setTitle("SET "+setNumber).setMessage("Starting in 3 seconds");
+
+                        final AlertDialog alert = dialog.create();
+                        alert.show();
+
+                        // Hide after some seconds
+                        final Handler handler  = new Handler();
+                        final Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (alert.isShowing()) {
+                                    alert.dismiss();
+                                    ExecutionFragment fragment = new ExecutionFragment();
+                                    Bundle arguments = new Bundle();
+                                    arguments.putInt("workout_id", workoutId);
+                                    arguments.putInt("ex_num", 0);
+                                    arguments.putInt("set_num", setNumber);
+                                    arguments.putInt("time", paramTime);
+                                    fragment.setArguments(arguments);
+
+                                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                    fragmentTransaction.replace(R.id.frame, fragment);
+                                    fragmentTransaction.commitAllowingStateLoss();
+                                }
+                            }
+                        };
+
+                        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                handler.removeCallbacks(runnable);
+                            }
+                        });
+
+                        handler.postDelayed(runnable, 3000);
+                    }else{
+                        quitWorkout(view);
+                    }
+
+                }
             }
         });
 
@@ -205,6 +253,13 @@ public class ExecutionFragment extends Fragment {
                     btnPause.setCompoundDrawablesWithIntrinsicBounds(v.getContext().getResources().getDrawable(android.R.drawable.ic_media_pause), null, null, null);
                     btnPause.setText("Pause");
                 }
+            }
+        });
+
+        btnQuit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quitWorkout(view);
             }
         });
 
@@ -226,7 +281,6 @@ public class ExecutionFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -250,22 +304,12 @@ public class ExecutionFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
-    Exercise findExerciseById(int id, List<Exercise> list) {
+    public Exercise findExerciseById(int id, List<Exercise> list) {
         for(Exercise e : list) {
             if(e.getId() == id) {
                 return e;
@@ -273,5 +317,99 @@ public class ExecutionFragment extends Fragment {
         }
         return null;
     }
+
+    protected void setupView (View view){
+        workout = new Workout();
+        Cursor c1 = db.findWorkoutById(workoutId);
+
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_ID)).isEmpty()) {
+            workout.setId(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_ID)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_sets)).isEmpty()) {
+            workout.setSets(c1.getInt(c1.getColumnIndex(GestioneDB.WORKOUT_sets)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_type)).isEmpty()) {
+            workout.setType(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_type)));
+        }
+        if(!c1.getString(c1.getColumnIndex(db.WORKOUT_name)).isEmpty()) {
+            workout.setName(c1.getString(c1.getColumnIndex(GestioneDB.WORKOUT_name)));
+        }
+
+        Cursor c = db.findRepsSetsByWorkoutId(workoutId);
+        exerciseList = new ArrayList<RepsSets>();
+
+        for( c.moveToFirst(); !c.isAfterLast(); c.moveToNext() ) {
+            RepsSets rp = new RepsSets();
+            eList = new ArrayList<>();
+            parser = getResources().getXml(R.xml.exercises);
+            try {
+                eList = ExercisesFragment.processXMLData(parser, eList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            rp.setExercise(findExerciseById(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_fk_exercise)),eList));
+            rp.setId(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_ID)));
+            rp.setReps(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_reps)));
+            rp.setRest(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_rest)));
+            rp.setSets(c.getInt(c.getColumnIndex(GestioneDB.REPS_SETS_sets)));
+            exerciseList.add(rp);
+        }
+
+        exercise = exerciseList.get(exNumber);
+
+        chrono = view.findViewById(R.id.chronometer);
+        txtReps = view.findViewById(R.id.txtReps);
+        txtExName = view.findViewById(R.id.txtExName);
+        totTime = view.findViewById(R.id.totTime);
+        btnDone = view.findViewById(R.id.btnDone);
+        btnPause = view.findViewById(R.id.btnPause);
+        btnQuit = view.findViewById(R.id.btnQuit);
+
+        if(exercise.getExercise().getType().equals("r")){
+            txtReps.setVisibility(View.VISIBLE);
+            chrono.setVisibility(View.INVISIBLE);
+            btnPause.setVisibility(View.INVISIBLE);
+            txtReps.setText("x"+exercise.getReps());
+            if(exercise.getReps()==0)
+                txtReps.setText("MAX");
+        }else{
+            txtReps.setVisibility(View.GONE);
+            chrono.setVisibility(View.VISIBLE);
+            btnPause.setVisibility(View.VISIBLE);
+            chrono.setBase(SystemClock.elapsedRealtime()+(exercise.getReps()*1000+1000));
+            chrono.start();
+        }
+
+        txtExName.setText(exercise.getExercise().getName());
+    }
+
+    public void quitWorkout(View view){
+        AlertDialog.Builder alert = new AlertDialog.Builder(view.getContext());
+        alert.setTitle("Finish Workout");
+        alert.setMessage("Are you sure you want to quit?");
+        alert.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                WorkoutDetailFragment fragment = new WorkoutDetailFragment();
+                Bundle arguments = new Bundle();
+                arguments.putInt("workout_id" , workoutId);
+                fragment.setArguments(arguments);
+
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment);
+                fragmentTransaction.addToBackStack("STACK");
+                fragmentTransaction.commitAllowingStateLoss();
+            }
+        });
+        alert.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // close dialog
+                dialog.cancel();
+            }
+        });
+        alert.show();
+    }
+
 
 }

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorDark1"
     tools:context=".fragments.ExecutionFragment">
 
@@ -16,41 +17,76 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <Chronometer
-        android:id="@+id/chronometer"
+    <TextView
+        android:id="@+id/txtExName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/totTime"
         android:layout_centerHorizontal="true"
         android:textColor="@color/colorPrimary"
-        android:textSize="80sp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:visibility="invisible" />
+        tools:text="n/a" />
+
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtExName"
+        android:layout_centerHorizontal="true"
+        android:textSize="80sp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        android:visibility="invisible"/>
 
     <TextView
         android:id="@+id/txtReps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/totTime"
+        android:layout_below="@id/txtExName"
         android:layout_centerHorizontal="true"
         android:textColor="@color/colorPrimary"
         android:textSize="80sp"
         android:textStyle="bold"
         tools:text="n/a" />
 
-    <Button
-        android:id="@+id/btnDone"
-        style="@style/TextAppearance.AppCompat.Widget.Button"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="-1dp"
-        android:background="@color/colorDialogDark"
-        android:text="Done"
-        android:textColor="@color/colorPrimary"
-        android:textSize="30sp"
-        android:textStyle="bold" />
+        android:layout_height="@dimen/standard_buttons"
+        android:layout_alignParentBottom="true">
+
+        <android.support.design.button.MaterialButton
+            android:id="@+id/btnDone"
+            style="@style/Theme.MaterialComponents.Light.Dialog.Alert"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/colorDialogDark"
+            android:gravity="center"
+            android:text="DONE"
+            android:textColor="@color/colorPrimary"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/colorDialogDark"
+            app:strokeColor="@color/colorPrimary"
+            app:strokeWidth="1dp" />
+
+        <android.support.design.button.MaterialButton
+            android:id="@+id/btnQuit"
+            style="@style/Theme.MaterialComponents.Light.Dialog.Alert"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/colorDialogDark"
+            android:gravity="center"
+            android:text="QUIT"
+            android:textColor="@color/colorPrimary"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/colorDialogDark"
+            app:strokeColor="@color/colorPrimary"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnPause"
